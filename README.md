@@ -41,6 +41,9 @@ Open a terminal and run:
 cd server
 npm install
 npm run dev
+
+cd ~/extra/intern/task1/todo-app/server
+ npm run dev
 ```
 The server will run on http://localhost:5000.
 
@@ -50,6 +53,9 @@ Open a second terminal and run:
 cd client
 npm install
 npm run dev
+
+cd ~/extra/intern/task1/todo-app/client
+ npm run dev
 ```
 The frontend will run on http://localhost:5173.
 
