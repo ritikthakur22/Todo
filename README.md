@@ -2,6 +2,9 @@
 
 ![Dashboard Screenshot](./assets/screenshot.png)
 
+🚀 **Live Demo:** [https://todocrdy.vercel.app/](https://todocrdy.vercel.app/)
+
+
 ## 🛠 What is Used
 - **Frontend**: React.js, Vite
 - **Backend**: Node.js, Express.js
@@ -59,7 +62,28 @@ cd ~/extra/intern/task1/todo-app/client
 ```
 The frontend will run on http://localhost:5173.
 
+
+## 🌍 Production Deployment
+
+This project uses a decoupled deployment strategy for maximum performance and stability:
+
+### 1. Backend (Render)
+The Node.js/Express server is hosted on [Render](https://render.com).
+- **Root Directory**: `server`
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
+- **Environment Variables**:
+  - `PORT`: `5000`
+  - `MONGODB_URI`: Your MongoDB Atlas connection string.
+
+### 2. Frontend (Vercel)
+The React/Vite client is hosted on [Vercel](https://vercel.com) for global CDN edge delivery.
+- **Root Directory**: `client`
+- **Environment Variables**:
+  - `VITE_API_URL`: The live URL provided by Render (e.g., `https://todo-crdy.onrender.com/api/todos`)
+
 ---
+
 ## 📚 Additional Guides
 For more detailed information, please check out:
 - [Frontend Guide](./client/README.md)
