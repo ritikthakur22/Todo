@@ -1,0 +1,12 @@
+# Dependencies — always re-downloadable with npm install
+node_modules/
+
+# Environment variables — NEVER commit secrets to Git
+# Anyone with your .env can access your database!
+.env
+
+# Vite build output
+dist/
+
+# OS files
+.DS_Store

@@ -1,0 +1,270 @@
+/* index.css — Global styles for the entire Todo app */
+
+/* Reset: removes default browser spacing differences */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ─── App Container ─────────────────────────────────────── */
+.app {
+  max-width: 600px;
+  margin: 0 auto;         /* centers the app horizontally */
+  padding: 2rem 1rem;
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+.app-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2.2rem;
+  color: #2c3e50;
+  margin-bottom: 0.3rem;
+}
+
+.app-header p {
+  color: #7f8c8d;
+  font-size: 1rem;
+}
+
+/* ─── Todo Form ───────────────────────────────────────────── */
+.todo-form {
+  display: flex;          /* puts input and button side by side */
+  gap: 0.5rem;            /* space between them */
+  margin-bottom: 1.5rem;
+}
+
+.todo-input {
+  flex: 1;                /* takes up all remaining space */
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.todo-input:focus {
+  border-color: #3498db;  /* blue border when typing */
+}
+
+/* ─── Buttons ─────────────────────────────────────────────── */
+
+/* Base button style — shared by all buttons */
+.btn {
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);  /* slight lift on hover */
+}
+
+/* Blue "Add" button */
+.btn-add {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-add:hover {
+  background-color: #2980b9;
+}
+
+/* Small grey edit button */
+.btn-edit {
+  background-color: #ecf0f1;
+  color: #555;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn-edit:hover {
+  background-color: #bdc3c7;
+}
+
+/* Small red delete button */
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+/* ─── Todo List ───────────────────────────────────────────── */
+.todo-list {
+  display: flex;
+  flex-direction: column;   /* stack items vertically */
+  gap: 0.6rem;              /* space between each item */
+}
+
+/* ─── Todo Item ───────────────────────────────────────────── */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: white;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  transition: box-shadow 0.2s;
+}
+
+.todo-item:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+/* When a todo is completed, the whole item looks "dimmed" */
+.todo-item.completed {
+  opacity: 0.6;
+}
+
+.todo-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3498db;   /* makes the checkbox blue when checked */
+}
+
+.todo-title {
+  flex: 1;                  /* takes up remaining space */
+  font-size: 1rem;
+}
+
+/* Strike-through text when todo is completed */
+.todo-item.completed .todo-title {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Inline edit input inside a todo item */
+.todo-edit-input {
+  flex: 1;
+  padding: 0.3rem 0.6rem;
+  font-size: 1rem;
+  border: 2px solid #3498db;
+  border-radius: 6px;
+  outline: none;
+}
+
+/* Green Save button */
+.btn-save {
+  background-color: #2ecc71;
+  color: white;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn-save:hover {
+  background-color: #27ae60;
+}
+
+/* Grey Cancel button */
+.btn-cancel {
+  background-color: #ecf0f1;
+  color: #555;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.btn-cancel:hover {
+  background-color: #bdc3c7;
+}
+
+
+/* ─── Filter Buttons ──────────────────────────────────────── */
+.todo-filter {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-filter {
+  background-color: #ecf0f1;
+  color: #555;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 20px;   /* pill shape */
+}
+
+.btn-filter:hover {
+  background-color: #dfe6e9;
+}
+
+/* The currently active filter gets a blue highlight */
+.btn-filter.active {
+  background-color: #3498db;
+  color: white;
+}
+
+/* ─── Loading State ───────────────────────────────────────── */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #3498db;
+  font-size: 1rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Error Banner ────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fdecea;
+  border: 1px solid #e74c3c;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.error-close {
+  background: none;
+  border: none;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.25rem;
+}
+
+/* ─── Empty State ─────────────────────────────────────────── */
+
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #999;
+  font-size: 1rem;
+}
+
