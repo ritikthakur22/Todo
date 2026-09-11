@@ -23,6 +23,12 @@ function App() {
 
   // Filter: 'all' | 'pending' | 'completed'
   const [filter, setFilter] = useState('all');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.body.className = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // ── useEffect — Load todos when the page first opens ──────
   //
@@ -113,6 +119,13 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
+        <button 
+          className="theme-toggle" 
+          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          title="Toggle Theme"
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
         <h1>📝 Todo List</h1>
         <p>{pendingCount} of {todos.length} task{todos.length !== 1 ? 's' : ''} remaining</p>
       </header>

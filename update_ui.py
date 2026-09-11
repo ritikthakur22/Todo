@@ -1,4 +1,10 @@
-/* index.css — Global styles for the entire Todo app */
+import re
+
+# 1. UPDATE index.css
+with open("client/src/index.css", "r") as f:
+    css = f.read()
+
+new_css = """/* index.css — Global styles for the entire Todo app */
 :root {
   --bg-color: #f0f2f5;
   --text-color: #333;
@@ -250,3 +256,51 @@ body.dark .btn-filter.active { box-shadow: 0 2px 8px rgba(187,134,252,0.4); }
 }
 body.dark .error-banner { background-color: #4a1915; color: #ff8a80; border-color: #ff5252; }
 .error-close { background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem; }
+"""
+
+with open("client/src/index.css", "w") as f:
+    f.write(new_css)
+
+
+# 2. UPDATE App.jsx
+with open("client/src/App.jsx", "r") as f:
+    app_jsx = f.read()
+
+# Add theme logic to App.jsx
+if "const [theme, setTheme]" not in app_jsx:
+    # insert useState for theme
+    app_jsx = app_jsx.replace(
+        "const [filter, setFilter] = useState('all');",
+        "const [filter, setFilter] = useState('all');\n  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');\n\n  useEffect(() => {\n    document.body.className = theme;\n    localStorage.setItem('theme', theme);\n  }, [theme]);"
+    )
+    
+    # insert theme toggle button in header
+    app_jsx = app_jsx.replace(
+        "<header className=\"app-header\">",
+        "<header className=\"app-header\">\n        <button \n          className=\"theme-toggle\" \n          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}\n          title=\"Toggle Theme\"\n        >\n          {theme === 'light' ? '🌙' : '☀️'}\n        </button>"
+    )
+
+with open("client/src/App.jsx", "w") as f:
+    f.write(app_jsx)
+
+
+# 3. UPDATE TodoItem.jsx
+with open("client/src/components/TodoItem.jsx", "r") as f:
+    item_jsx = f.read()
+
+# Replace view mode with one that includes a timestamp
+view_mode_old = """<span className="todo-title">{todo.title}</span>"""
+view_mode_new = """<div className="todo-content">
+          <span className="todo-title">{todo.title}</span>
+          <span className="todo-timestamp">
+            {todo.createdAt ? new Date(todo.createdAt).toLocaleString() : 'Just now'}
+          </span>
+        </div>"""
+
+if view_mode_old in item_jsx:
+    item_jsx = item_jsx.replace(view_mode_old, view_mode_new)
+
+with open("client/src/components/TodoItem.jsx", "w") as f:
+    f.write(item_jsx)
+
+print("UI updated successfully")

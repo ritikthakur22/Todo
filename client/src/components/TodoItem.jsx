@@ -63,7 +63,12 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         />
       ) : (
         // VIEW MODE: show the title as text
-        <span className="todo-title">{todo.title}</span>
+        <div className="todo-content">
+          <span className="todo-title">{todo.title}</span>
+          <span className="todo-timestamp">
+            {todo.createdAt ? new Date(todo.createdAt).toLocaleString() : 'Just now'}
+          </span>
+        </div>
       )}
 
       <div className="todo-actions">
