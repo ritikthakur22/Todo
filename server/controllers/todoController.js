@@ -35,7 +35,7 @@ export const getTodos = async (req, res) => {
 // Creates a new todo and saves it to MongoDB
 export const createTodo = async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, description, priority, dueDate, category, tags } = req.body;
 
     // Validation — don't even try to save if title is missing
     if (!title || title.trim() === '') {
@@ -46,7 +46,7 @@ export const createTodo = async (req, res) => {
     //   1. Creates a new Todo document with the given data
     //   2. Saves it to MongoDB immediately
     // MongoDB auto-generates a unique _id (e.g. "64a1f2b3c4e5f67890abcdef")
-    const newTodo = await Todo.create({ title });
+    const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags });
 
     // 201 = Created — something new was made
     res.status(201).json(newTodo);
@@ -60,12 +60,17 @@ export const createTodo = async (req, res) => {
 export const updateTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, completed } = req.body;
+    const { title, completed, description, priority, dueDate, category, tags } = req.body;
 
     // Build an object with only the fields that were sent
     const updates = {};
     if (title !== undefined) updates.title = title.trim();
     if (completed !== undefined) updates.completed = completed;
+    if (description !== undefined) updates.description = description;
+    if (priority !== undefined) updates.priority = priority;
+    if (dueDate !== undefined) updates.dueDate = dueDate;
+    if (category !== undefined) updates.category = category;
+    if (tags !== undefined) updates.tags = tags;
 
     // findByIdAndUpdate(id, updates, options):
     //   id      → MongoDB's _id field (automatically searches by _id)

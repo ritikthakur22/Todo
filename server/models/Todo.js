@@ -16,17 +16,15 @@ import mongoose from 'mongoose';
 // Schema says: "Every todo document MUST look like this"
 const todoSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,       // must be text
-      required: [true, 'Title is required'],  // cannot be empty
-      trim: true,         // automatically removes extra spaces from start/end
-      maxlength: [200, 'Title cannot exceed 200 characters'],
-    },
+    
+    title: { type: String, required: true, trim: true },
+    description: { type: String, default: "" },
+    priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
+    dueDate: { type: Date, default: null },
+    category: { type: String, default: 'Personal' },
+    tags: { type: [String], default: [] },
+    completed: { type: Boolean, default: false },
 
-    completed: {
-      type: Boolean,
-      default: false,     // new todos are NOT completed by default
-    },
   },
 
   {

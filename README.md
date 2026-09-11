@@ -1,7 +1,6 @@
 # Todo App - Full Stack Project
 
-## 📖 Definition and Basic Concept
-This is a full-stack web application built to manage a simple Todo list. It allows users to create, read, update, and delete (CRUD) tasks. The project is split into a frontend client and a backend server, communicating via RESTful APIs.
+![Dashboard Screenshot](./assets/screenshot.png)
 
 ## 🛠 What is Used
 - **Frontend**: React.js, Vite
