@@ -174,7 +174,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         </span>
         {todo.dueDate && (
           <span className="badge date">
-            <Calendar size={12} /> {new Date(todo.dueDate).toLocaleDateString()}
+            <Calendar size={12} /> Due: {new Date(todo.dueDate).toLocaleDateString()}
           </span>
         )}
       </div>
