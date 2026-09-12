@@ -1,13 +1,12 @@
 
 import { useState, useRef } from 'react';
-import { Plus, Flag, Calendar, Tag, Image as ImageIcon, User, X } from 'lucide-react';
+import { Plus, Flag, Calendar,User, X } from 'lucide-react';
 import { uploadImage } from '../api/todoapi';
 
 function TodoForm({ onAdd }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Medium');
-  const [category, setCategory] = useState('Personal');
   const [createdBy, setCreatedBy] = useState('Ritik');
   const [assignedTo, setAssignedTo] = useState('Myself');
   const [dueDate, setDueDate] = useState(() => {

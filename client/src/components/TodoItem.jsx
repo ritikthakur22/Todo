@@ -1,6 +1,6 @@
 
-import { useState, useRef } from 'react';
-import { Edit2, Trash2, Calendar, Tag, ArrowUp, ArrowRight, ArrowDown, Save, X, GripVertical, Plus, User, Image as ImageIcon } from 'lucide-react';
+import { useState} from 'react';
+import { Edit2, Trash2, Calendar,ArrowUp, ArrowRight, ArrowDown, Save, X, GripVertical, Plus, User,} from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { uploadImage } from '../api/todoapi';

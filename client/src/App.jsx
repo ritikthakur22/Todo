@@ -10,7 +10,6 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import './index.css';
 
 function App() {
-  const [localTodos, setLocalTodos] = useState(null); // null = use server data
   const [mutationError, setMutationError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
