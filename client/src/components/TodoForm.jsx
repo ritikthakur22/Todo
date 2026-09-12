@@ -1,6 +1,6 @@
 
 import { useState, useRef } from 'react';
-import { Plus, Flag, Calendar,User, X } from 'lucide-react';
+import { Plus, Flag, Calendar,User, X , Image as ImageIcon} from 'lucide-react';
 import { uploadImage } from '../api/todoapi';
 
 function TodoForm({ onAdd }) {
