@@ -13,7 +13,7 @@ function TodoForm({ onAdd }) {
   const [dueDate, setDueDate] = useState(() => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 16);
+    return d.toISOString().split('T')[0];
   });
   const [attachment, setAttachment] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -102,7 +102,7 @@ function TodoForm({ onAdd }) {
           </div>
           <div className="option-group">
             <label><Calendar size={14} /> Due Date</label>
-            <input type="datetime-local" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           </div>
           <div className="option-group">
             <label><ImageIcon size={14} /> Image</label>

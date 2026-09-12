@@ -48,7 +48,7 @@ export const getTodos = async (req, res) => {
 // Creates a new todo and saves it to MongoDB
 export const createTodo = async (req, res) => {
   try {
-    const { title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo } = req.body;
+    const { title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo, subtasks } = req.body;
 
     // Validation — don't even try to save if title is missing
     if (!title || title.trim() === '') {
@@ -59,7 +59,7 @@ export const createTodo = async (req, res) => {
     //   1. Creates a new Todo document with the given data
     //   2. Saves it to MongoDB immediately
     // MongoDB auto-generates a unique _id (e.g. "64a1f2b3c4e5f67890abcdef")
-    const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo });
+    const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo, subtasks });
 
     // 201 = Created — something new was made
     res.status(201).json(newTodo);

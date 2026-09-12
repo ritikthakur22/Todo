@@ -17,13 +17,14 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
     category: todo.category || 'Personal',
     createdBy: todo.createdBy || 'Ritik',
     assignedTo: todo.assignedTo || 'Myself',
-    dueDate: todo.dueDate ? (() => { const d = new Date(todo.dueDate); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); })() : '',
+    dueDate: todo.dueDate ? todo.dueDate.split('T')[0] : '',
     subtasks: todo.subtasks || [],
     attachmentUrl: todo.attachmentUrl || ''
   });
   const [newSubtask, setNewSubtask] = useState('');
   const [newFile, setNewFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const getPriorityIcon = (p) => {
     if (p === 'High') return <ArrowUp size={12} color="#ef4444" />;
@@ -84,7 +85,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
             </div>
             <div className="option-group">
               <label>Due Date</label>
-              <input type="datetime-local" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} />
+              <input type="date" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} />
             </div>
             <div className="option-group">
               <label>Image Update</label>
@@ -128,8 +129,30 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         <div className="task-title">{todo.title}</div>
         {todo.description && <div className="task-desc">{todo.description}</div>}
         {todo.attachmentUrl && (
-          <div style={{ marginTop: '0.5rem' }}>
-            <img src={todo.attachmentUrl} alt="attachment" style={{ maxWidth: '100px', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
+          <div style={{ marginTop: '0.5rem', position: 'relative', display: 'inline-block' }}>
+            <img 
+              src={todo.attachmentUrl} 
+              alt="attachment" 
+              onClick={() => setIsZoomed(true)}
+              style={{ maxWidth: '100px', borderRadius: '4px', border: '1px solid var(--border-color)', cursor: 'zoom-in' }} 
+            />
+          </div>
+        )}
+        
+        {isZoomed && (
+          <div 
+            onClick={() => setIsZoomed(false)}
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <img src={todo.attachmentUrl} style={{ maxWidth: '90%', maxHeight: '80%', borderRadius: '8px', cursor: 'zoom-out' }} />
+            <a 
+              href={todo.attachmentUrl.replace('/upload/', '/upload/fl_attachment/')} 
+              download 
+              onClick={(e) => e.stopPropagation()}
+              style={{ marginTop: '1rem', background: 'var(--primary)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', textDecoration: 'none' }}
+            >
+              Download Image
+            </a>
           </div>
         )}
         {todo.subtasks && todo.subtasks.length > 0 && (
@@ -140,6 +163,9 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
       </div>
 
       <div className="task-meta">
+        <span className="badge" style={{ borderColor: 'var(--border-color)', color: 'var(--text-muted)' }}>
+          Created: {new Date(todo.createdAt).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}
+        </span>
         <span className="badge category">
           <User size={12} /> {todo.createdBy || 'Ritik'} → {todo.assignedTo || 'Myself'}
         </span>
@@ -148,7 +174,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         </span>
         {todo.dueDate && (
           <span className="badge date">
-            <Calendar size={12} /> {new Date(todo.dueDate).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}
+            <Calendar size={12} /> {new Date(todo.dueDate).toLocaleDateString()}
           </span>
         )}
       </div>
