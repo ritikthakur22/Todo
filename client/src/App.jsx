@@ -1,24 +1,39 @@
 
-import { useState, useEffect } from 'react';
-import { Home, BarChart2, Tags, Settings, Moon, Sun, CheckSquare, ChevronDown } from 'lucide-react';
-import todoService from './services/todoService';
+import { useState, useEffect, useMemo } from 'react';
+import { Home, BarChart2, Moon, Sun, CheckSquare } from 'lucide-react';
+import { useTodos, useAddTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } from './hooks/todo.hook';
 import TodoForm from './components/TodoForm';
 import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { useTodos } from './hooks/todo.hook';
 import './index.css';
 
 function App() {
-  const [todos, setTodos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [localTodos, setLocalTodos] = useState(null); // null = use server data
+  const [mutationError, setMutationError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [currentTab, setCurrentTab] = useState('tasks');
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  // ── Infinite Query ──────────────────────────────────────────
+  const {
+    data,
+    isLoading,
+    isError,
+    error: queryError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useTodos(10);
+
+  // Flatten all fetched pages into one array
+  const todos = useMemo(
+    () => (data?.pages ?? []).flatMap((page) => page.data),
+    [data]
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -30,47 +45,30 @@ function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    const loadTodos = async () => {
-      setLoading(true);
-      try {
-        const result = await todoService.getTodos(page, 10);
-        setTodos(result.data);
-        setTotalPages(result.pagination.pages);
-      } catch (err) {
-        setError('Failed to load todos.');
-      } finally { setLoading(false); }
-    };
-    loadTodos();
-  }, [page]);
-
   const handleAdd = async (todoData) => {
     try {
-      const newTodo = await todoService.createTodo({ ...todoData, order: todos.length });
-      setTodos([newTodo, ...todos]);
-    } catch (err) { setError(err.message); }
+      await addTodo({ ...todoData, order: todos.length });
+      // Refetch first page — React Query will revalidate automatically
+    } catch (err) { setMutationError(err.message); }
   };
 
   const handleToggle = async (id) => {
     const todo = todos.find((t) => t._id === id);
     try {
-      const updated = await todoService.updateTodo(id, { completed: !todo.completed });
-      setTodos(todos.map((t) => (t._id === id ? updated : t)));
-    } catch (err) { setError(err.message); }
+      await updateTodoReq({ id, data: { completed: !todo.completed } });
+    } catch (err) { setMutationError(err.message); }
   };
 
   const handleEdit = async (id, data) => {
     try {
-      const updated = await todoService.updateTodo(id, data);
-      setTodos(todos.map((t) => (t._id === id ? updated : t)));
-    } catch (err) { setError(err.message); }
+      await updateTodoReq({ id, data });
+    } catch (err) { setMutationError(err.message); }
   };
 
   const handleDelete = async (id) => {
     try {
-      await todoService.deleteTodo(id);
-      setTodos(todos.filter((t) => t._id !== id));
-    } catch (err) { setError(err.message); }
+      await deleteTodoReq(id);
+    } catch (err) { setMutationError(err.message); }
   };
 
   const handleDragEnd = async (event) => {
@@ -83,7 +81,7 @@ function App() {
         
         // Update backend order
         const reorderData = newItems.map((item, index) => ({ _id: item._id, order: index }));
-        todoService.reorderTodos(reorderData).catch(console.error);
+        reorderTodosReq(reorderData).catch(console.error);
         return newItems;
       });
     }
@@ -99,6 +97,8 @@ function App() {
   const pendingCount = todos.filter((t) => !t.completed).length;
   const completedCount = todos.filter((t) => t.completed).length;
   const completionRate = todos.length === 0 ? 0 : Math.round((completedCount / todos.length) * 100);
+
+  const error = mutationError || (isError ? queryError?.message : null);
 
   return (
     <div className="dashboard">
@@ -173,30 +173,23 @@ function App() {
             </div>
 
             {error && <div className="error">{error}</div>}
-            
-            {loading ? <div className="loading">Loading...</div> : 
+
+            {isLoading ? <div className="loading">Loading...</div> :
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <TodoList todos={filteredTodos} onToggle={handleToggle} onDelete={handleDelete} onEdit={handleEdit} />
               </DndContext>
             }
 
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</button>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  Page 
-                  <select 
-                    value={page} 
-                    onChange={(e) => setPage(Number(e.target.value))}
-                    style={{ background: 'var(--bg-dark)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0.2rem 0.5rem', outline: 'none', cursor: 'pointer' }}
-                  >
-                    {[...Array(totalPages)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>{i + 1}</option>
-                    ))}
-                  </select>
-                  of {totalPages}
-                </span>
-                <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next</button>
+            {/* ── Load More ───────────────────────────────── */}
+            {hasNextPage && (
+              <div className="pagination" style={{ justifyContent: 'center' }}>
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  style={{ minWidth: '140px' }}
+                >
+                  {isFetchingNextPage ? 'Loading…' : 'Load More'}
+                </button>
               </div>
             )}
           </>

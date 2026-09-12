@@ -1,7 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { Plus, Flag, Calendar, Tag, Image as ImageIcon, User, X } from 'lucide-react';
-import todoService from '../services/todoService';
+import { uploadImage } from '../api/todoapi';
 
 function TodoForm({ onAdd }) {
   const [title, setTitle] = useState('');
@@ -39,7 +39,7 @@ function TodoForm({ onAdd }) {
     if (attachment) {
       setIsUploading(true);
       try {
-        const res = await todoService.uploadImage(attachment);
+        const res = await uploadImage(attachment);
         attachmentUrl = res.url;
       } catch (err) {
         console.error("Upload failed", err);

@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 import { Edit2, Trash2, Calendar, Tag, ArrowUp, ArrowRight, ArrowDown, Save, X, GripVertical, Plus, User, Image as ImageIcon } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import todoService from '../services/todoService';
+import { uploadImage } from '../api/todoapi';
 
 function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: todo._id });
@@ -38,7 +38,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
     let finalUrl = editData.attachmentUrl;
     if (newFile) {
       try {
-        const res = await todoService.uploadImage(newFile);
+        const res = await uploadImage(newFile);
         finalUrl = res.url;
       } catch (err) { console.error("Upload failed", err); }
     }
