@@ -133,3 +133,26 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color
 .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; }
 .pagination button { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
 .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* RESPONSIVE DESIGN (MOBILE & TABLET) */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-options { flex-wrap: wrap; gap: 1rem; }
+  .edit-options-row { flex-wrap: wrap; gap: 1rem; }
+}
+
+@media (max-width: 600px) {
+  .top-nav { padding: 0.8rem 1rem; }
+  .nav-center { display: none; /* Hide tabs on very small screens or move them below */ }
+  .stats-grid { grid-template-columns: 1fr; }
+  .form-top { flex-direction: column; }
+  .btn-add { width: 100%; justify-content: center; padding: 0.8rem; }
+  .filters-row { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .filter-pills { overflow-x: auto; padding-bottom: 0.5rem; justify-content: flex-start; }
+  .task-row { flex-direction: column; align-items: flex-start; position: relative; padding-left: 2.5rem; }
+  .drag-handle { position: absolute; left: 0; top: 1rem; }
+  .task-check { position: absolute; right: 1rem; top: 1.2rem; }
+  .task-check input { margin-right: 0; }
+  .task-meta { flex-wrap: wrap; margin-right: 0; margin-bottom: 1rem; }
+  .task-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 0.8rem; }
+}
