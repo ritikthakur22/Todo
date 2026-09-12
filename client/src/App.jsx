@@ -34,7 +34,7 @@ function App() {
     const loadTodos = async () => {
       setLoading(true);
       try {
-        const result = await todoService.getTodos(page, 20);
+        const result = await todoService.getTodos(page, 10);
         setTodos(result.data);
         setTotalPages(result.pagination.pages);
       } catch (err) {
