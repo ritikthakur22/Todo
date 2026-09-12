@@ -23,7 +23,19 @@ const todoSchema = new mongoose.Schema(
     dueDate: { type: Date, default: null },
     category: { type: String, default: 'Personal' },
     tags: { type: [String], default: [] },
+    
     completed: { type: Boolean, default: false },
+    subtasks: [
+      {
+        title: { type: String, required: true },
+        completed: { type: Boolean, default: false }
+      }
+    ],
+    order: { type: Number, default: 0 },
+    attachmentUrl: { type: String, default: '' },
+    createdBy: { type: String, default: 'Ritik' },
+    assignedTo: { type: String, default: 'Myself' },
+
 
   },
 

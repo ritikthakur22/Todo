@@ -117,3 +117,19 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color
 .edit-actions-row { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 0.5rem; }
 .btn-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; height: 38px;}
 .btn-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+
+/* SUBTASKS & DND */
+.drag-handle { cursor: grab; padding: 0.5rem; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.drag-handle:active { cursor: grabbing; }
+.subtasks-section { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+.subtasks-section h4 { margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.subtask-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.subtask-row input { accent-color: var(--primary); }
+.subtask-row span.completed { text-decoration: line-through; color: var(--text-muted); }
+.add-subtask-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.add-subtask-row input { flex: 1; background: transparent; border: 1px solid var(--border-color); color: white; padding: 0.4rem; border-radius: 4px; font-size: 0.85rem; }
+.add-subtask-row button { background: var(--primary); color: white; border: none; padding: 0 0.5rem; border-radius: 4px; cursor: pointer; }
+.task-subtasks-preview { font-size: 0.75rem; color: var(--primary); font-weight: 500; margin-top: 0.3rem; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; }
+.pagination button { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }

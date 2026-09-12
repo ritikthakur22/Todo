@@ -1,8 +1,17 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/todos";
 
-export const getTodos = async () => {
-  const response = await fetch(API_URL);
+export const getTodos = async (page = 1, limit = 10) => {
+  const response = await fetch(`${API_URL}?page=${page}&limit=${limit}`);
   if (!response.ok) throw new Error('Failed to fetch todos');
+  return response.json();
+};
+export const reorderTodos = async (items) => {
+  const response = await fetch(`${API_URL}/reorder`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }),
+  });
+  if (!response.ok) throw new Error('Failed to reorder');
   return response.json();
 };
 
@@ -38,8 +47,21 @@ export const deleteTodo = async (id) => {
   return response.json();
 };
 
+export const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  const response = await fetch(`${API_URL}/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) throw new Error('Failed to upload image');
+  return response.json();
+};
+
 const todoService = {
+  uploadImage,
   getTodos,
+  reorderTodos,
   createTodo,
   updateTodo,
   deleteTodo

@@ -1,17 +1,29 @@
-import { useState } from 'react';
-import { Edit2, Trash2, Calendar, Tag, ArrowUp, ArrowRight, ArrowDown, Save, X } from 'lucide-react';
+
+import { useState, useRef } from 'react';
+import { Edit2, Trash2, Calendar, Tag, ArrowUp, ArrowRight, ArrowDown, Save, X, GripVertical, Plus, User, Image as ImageIcon } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import todoService from '../services/todoService';
 
 function TodoItem({ todo, onToggle, onDelete, onEdit }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: todo._id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Keep all fields in a single state object for the edit form
   const [editData, setEditData] = useState({
     title: todo.title,
     description: todo.description || '',
     priority: todo.priority || 'Medium',
     category: todo.category || 'Personal',
-    dueDate: todo.dueDate ? todo.dueDate.split('T')[0] : ''
+    createdBy: todo.createdBy || 'Ritik',
+    assignedTo: todo.assignedTo || 'Myself',
+    dueDate: todo.dueDate ? (() => { const d = new Date(todo.dueDate); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); })() : '',
+    subtasks: todo.subtasks || [],
+    attachmentUrl: todo.attachmentUrl || ''
   });
+  const [newSubtask, setNewSubtask] = useState('');
+  const [newFile, setNewFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const getPriorityIcon = (p) => {
     if (p === 'High') return <ArrowUp size={12} color="#ef4444" />;
@@ -19,52 +31,83 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
     return <ArrowDown size={12} color="#10b981" />;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editData.title.trim()) return;
-    onEdit(todo._id, editData);
+    setIsUploading(true);
+    let finalUrl = editData.attachmentUrl;
+    if (newFile) {
+      try {
+        const res = await todoService.uploadImage(newFile);
+        finalUrl = res.url;
+      } catch (err) { console.error("Upload failed", err); }
+    }
+    const finalData = { ...editData, attachmentUrl: finalUrl };
+    onEdit(todo._id, finalData);
+    setEditData(finalData);
+    setIsUploading(false);
     setIsEditing(false);
+  };
+
+  const toggleSubtask = (index) => {
+    const newSubtasks = [...editData.subtasks];
+    newSubtasks[index].completed = !newSubtasks[index].completed;
+    setEditData({ ...editData, subtasks: newSubtasks });
+  };
+
+  const addSubtask = () => {
+    if (!newSubtask.trim()) return;
+    setEditData({ ...editData, subtasks: [...editData.subtasks, { title: newSubtask, completed: false }] });
+    setNewSubtask('');
   };
 
   if (isEditing) {
     return (
-      <div className="task-row editing-mode">
+      <div ref={setNodeRef} style={style} className="task-row editing-mode">
         <div className="edit-form-full">
-          <input 
-            className="edit-input-title" 
-            value={editData.title} 
-            onChange={(e) => setEditData({...editData, title: e.target.value})} 
-            autoFocus 
-          />
-          <textarea 
-            className="edit-input-desc" 
-            value={editData.description} 
-            onChange={(e) => setEditData({...editData, description: e.target.value})} 
-            placeholder="Add a description..."
-          />
+          <input className="edit-input-title" value={editData.title} onChange={(e) => setEditData({...editData, title: e.target.value})} autoFocus />
+          <textarea className="edit-input-desc" value={editData.description} onChange={(e) => setEditData({...editData, description: e.target.value})} placeholder="Add a description..." />
+          
           <div className="edit-options-row">
+            <div className="option-group">
+              <label>Created By</label>
+              <input type="text" value={editData.createdBy} onChange={e => setEditData({...editData, createdBy: e.target.value})} />
+            </div>
+            <div className="option-group">
+              <label>Assign To</label>
+              <input type="text" value={editData.assignedTo} onChange={e => setEditData({...editData, assignedTo: e.target.value})} />
+            </div>
             <div className="option-group">
               <label>Priority</label>
               <select value={editData.priority} onChange={(e) => setEditData({...editData, priority: e.target.value})}>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
+                <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
               </select>
             </div>
             <div className="option-group">
               <label>Due Date</label>
-              <input type="date" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} />
+              <input type="datetime-local" value={editData.dueDate} onChange={(e) => setEditData({...editData, dueDate: e.target.value})} />
             </div>
             <div className="option-group">
-              <label>Category</label>
-              <select value={editData.category} onChange={(e) => setEditData({...editData, category: e.target.value})}>
-                <option value="Work">Work</option>
-                <option value="Personal">Personal</option>
-                <option value="Education">Education</option>
-              </select>
+              <label>Image Update</label>
+              <input type="file" accept="image/*" onChange={(e) => setNewFile(e.target.files[0])} style={{fontSize: '0.8rem', width: '150px'}} />
             </div>
           </div>
+          
+          <div className="subtasks-section">
+            <h4>Subtasks</h4>
+            {editData.subtasks.map((st, i) => (
+              <div key={i} className="subtask-row">
+                <input type="checkbox" checked={st.completed} onChange={() => toggleSubtask(i)} />
+                <span className={st.completed ? 'completed' : ''}>{st.title}</span>
+              </div>
+            ))}
+            <div className="add-subtask-row">
+              <input value={newSubtask} onChange={e => setNewSubtask(e.target.value)} placeholder="New subtask..." onKeyDown={e => e.key === 'Enter' && addSubtask()}/>
+              <button onClick={addSubtask}><Plus size={14}/></button>
+            </div>
+          </div>
+
           <div className="edit-actions-row">
-            <button className="btn-add" onClick={handleSave}><Save size={16} /> Save Changes</button>
+            <button className="btn-add" onClick={handleSave} disabled={isUploading}>{isUploading ? 'Saving...' : <><Save size={16} /> Save Changes</>}</button>
             <button className="btn-cancel" onClick={() => setIsEditing(false)}><X size={16} /> Cancel</button>
           </div>
         </div>
@@ -73,7 +116,10 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
   }
 
   return (
-    <div className={`task-row ${todo.completed ? 'completed' : ''}`}>
+    <div ref={setNodeRef} style={style} className={`task-row ${todo.completed ? 'completed' : ''}`}>
+      <div className="drag-handle" {...attributes} {...listeners}>
+        <GripVertical size={16} color="var(--text-muted)" />
+      </div>
       <div className="task-check">
         <input type="checkbox" checked={todo.completed} onChange={() => onToggle(todo._id)} />
       </div>
@@ -81,23 +127,30 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
       <div className="task-content">
         <div className="task-title">{todo.title}</div>
         {todo.description && <div className="task-desc">{todo.description}</div>}
-        <div className="task-badges">
-          {todo.tags && todo.tags.map(t => <span key={t} className="tag-badge">#{t}</span>)}
-        </div>
+        {todo.attachmentUrl && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <img src={todo.attachmentUrl} alt="attachment" style={{ maxWidth: '100px', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
+          </div>
+        )}
+        {todo.subtasks && todo.subtasks.length > 0 && (
+          <div className="task-subtasks-preview">
+            {todo.subtasks.filter(st => st.completed).length} / {todo.subtasks.length} Subtasks
+          </div>
+        )}
       </div>
 
       <div className="task-meta">
+        <span className="badge category">
+          <User size={12} /> {todo.createdBy || 'Ritik'} → {todo.assignedTo || 'Myself'}
+        </span>
         <span className={`badge priority-${todo.priority?.toLowerCase()}`}>
           {getPriorityIcon(todo.priority)} {todo.priority}
         </span>
         {todo.dueDate && (
           <span className="badge date">
-            <Calendar size={12} /> {new Date(todo.dueDate).toLocaleDateString()}
+            <Calendar size={12} /> {new Date(todo.dueDate).toLocaleString([], { dateStyle: "short", timeStyle: "short" })}
           </span>
         )}
-        <span className="badge category">
-          <Tag size={12} /> {todo.category}
-        </span>
       </div>
 
       <div className="task-actions">

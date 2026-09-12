@@ -21,11 +21,24 @@ import Todo from '../models/Todo.js';
 // Returns all todos, newest first
 export const getTodos = async (req, res) => {
   try {
-    // Todo.find({}) → get ALL documents (empty filter = no conditions)
-    // .sort({ createdAt: -1 }) → newest first (-1 = descending)
-    const todos = await Todo.find({}).sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    res.status(200).json(todos);
+    const total = await Todo.countDocuments();
+    const todos = await Todo.find({})
+      .sort({ order: 1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      data: todos,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -35,7 +48,7 @@ export const getTodos = async (req, res) => {
 // Creates a new todo and saves it to MongoDB
 export const createTodo = async (req, res) => {
   try {
-    const { title, description, priority, dueDate, category, tags } = req.body;
+    const { title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo } = req.body;
 
     // Validation — don't even try to save if title is missing
     if (!title || title.trim() === '') {
@@ -46,7 +59,7 @@ export const createTodo = async (req, res) => {
     //   1. Creates a new Todo document with the given data
     //   2. Saves it to MongoDB immediately
     // MongoDB auto-generates a unique _id (e.g. "64a1f2b3c4e5f67890abcdef")
-    const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags });
+    const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo });
 
     // 201 = Created — something new was made
     res.status(201).json(newTodo);
@@ -60,7 +73,7 @@ export const createTodo = async (req, res) => {
 export const updateTodo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, completed, description, priority, dueDate, category, tags } = req.body;
+    const { title, completed, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo } = req.body;
 
     // Build an object with only the fields that were sent
     const updates = {};
@@ -71,6 +84,11 @@ export const updateTodo = async (req, res) => {
     if (dueDate !== undefined) updates.dueDate = dueDate;
     if (category !== undefined) updates.category = category;
     if (tags !== undefined) updates.tags = tags;
+    if (attachmentUrl !== undefined) updates.attachmentUrl = attachmentUrl;
+    if (createdBy !== undefined) updates.createdBy = createdBy;
+    if (assignedTo !== undefined) updates.assignedTo = assignedTo;
+    if (req.body.subtasks !== undefined) updates.subtasks = req.body.subtasks;
+    if (req.body.order !== undefined) updates.order = req.body.order;
 
     // findByIdAndUpdate(id, updates, options):
     //   id      → MongoDB's _id field (automatically searches by _id)
@@ -106,6 +124,26 @@ export const deleteTodo = async (req, res) => {
     }
 
     res.status(200).json({ message: 'Todo deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ── PUT /api/todos/reorder ────────────────────────────────────
+export const reorderTodos = async (req, res) => {
+  try {
+    const { items } = req.body; // Array of { _id, order }
+    
+    // Bulk write for performance
+    const bulkOps = items.map(item => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { order: item.order }
+      }
+    }));
+
+    await Todo.bulkWrite(bulkOps);
+    res.status(200).json({ message: 'Reordered successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
