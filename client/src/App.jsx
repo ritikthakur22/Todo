@@ -7,7 +7,6 @@ import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useTodos } from './hooks/todo.hook';
 import './index.css';
 
 function App() {
