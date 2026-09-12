@@ -106,9 +106,11 @@ function App() {
     return matchesFilter && matchesSearch;
   });
 
-  const pendingCount = todos.filter((t) => !t.completed).length;
-  const completedCount = todos.filter((t) => t.completed).length;
-  const completionRate = todos.length === 0 ? 0 : Math.round((completedCount / todos.length) * 100);
+  const globalStats = data?.pages?.[0]?.stats || { total: 0, pending: 0, completed: 0 };
+  const totalCount = globalStats.total;
+  const pendingCount = globalStats.pending;
+  const completedCount = globalStats.completed;
+  const completionRate = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
   const error = mutationError || (isError ? queryError?.message : null);
 
@@ -147,7 +149,7 @@ function App() {
                 <div className="stat-icon blue"><CheckSquare size={20} /></div>
                 <div className="stat-info">
                   <span className="stat-label">Total Tasks</span>
-                  <span className="stat-value">{todos.length}</span>
+                  <span className="stat-value">{totalCount}</span>
                 </div>
               </div>
               <div className="stat-card">
@@ -178,7 +180,7 @@ function App() {
             <div className="filters-row">
               <input type="text" className="search-bar" placeholder="Search tasks..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               <div className="filter-pills">
-                <button className={`pill ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All <span className="badge">{todos.length}</span></button>
+                <button className={`pill ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All <span className="badge">{totalCount}</span></button>
                 <button className={`pill ${filter === 'active' ? 'active' : ''}`} onClick={() => setFilter('active')}>Active <span className="badge">{pendingCount}</span></button>
                 <button className={`pill ${filter === 'completed' ? 'active' : ''}`} onClick={() => setFilter('completed')}>Completed <span className="badge">{completedCount}</span></button>
               </div>

@@ -26,6 +26,8 @@ export const getTodos = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const total = await Todo.countDocuments();
+    const completedCount = await Todo.countDocuments({ completed: true });
+    const pendingCount = total - completedCount;
     const todos = await Todo.find({})
       .sort({ order: 1, createdAt: -1 })
       .skip(skip)
@@ -37,7 +39,8 @@ export const getTodos = async (req, res) => {
         total,
         page,
         pages: Math.ceil(total / limit)
-      }
+      },
+      stats: { total, completed: completedCount, pending: pendingCount }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
