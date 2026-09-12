@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Home, BarChart2, Moon, Sun, CheckSquare } from 'lucide-react';
 import { useTodos, useAddTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } from './hooks/todo.hook';
 import TodoForm from './components/TodoForm';
@@ -29,6 +29,19 @@ function App() {
   } = useTodos(10);
 
   // Flatten all fetched pages into one array
+
+  const observer = useRef();
+  const lastTodoElementRef = useCallback(node => {
+    if (isLoading || isFetchingNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage]);
+
   const todos = useMemo(
     () => (data?.pages ?? []).flatMap((page) => page.data),
     [data]
@@ -179,18 +192,10 @@ function App() {
               </DndContext>
             }
 
-            {/* ── Load More ───────────────────────────────── */}
-            {hasNextPage && (
-              <div className="pagination" style={{ justifyContent: 'center' }}>
-                <button
-                  onClick={() => fetchNextPage()}
-                  disabled={isFetchingNextPage}
-                  style={{ minWidth: '140px' }}
-                >
-                  {isFetchingNextPage ? 'Loading…' : 'Load More'}
-                </button>
-              </div>
-            )}
+            {/* ── Auto Load More Trigger ───────────────────────────────── */}
+            <div ref={lastTodoElementRef} style={{ height: '20px', margin: '10px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              {isFetchingNextPage && 'Loading more tasks...'}
+            </div>
           </>
         ) : (
           <StatsDashboard todos={todos} />
