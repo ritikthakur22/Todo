@@ -27,6 +27,10 @@ function App() {
     hasNextPage,
     isFetchingNextPage,
   } = useTodos(10);
+  const { mutateAsync: addTodo } = useAddTodo();
+  const { mutateAsync: updateTodoReq } = useUpdateTodo();
+  const { mutateAsync: deleteTodoReq } = useDeleteTodo();
+  const { mutateAsync: reorderTodosReq } = useReorderTodos();
 
   // Flatten all fetched pages into one array
 
