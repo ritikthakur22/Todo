@@ -183,7 +183,19 @@ function App() {
             {totalPages > 1 && (
               <div className="pagination">
                 <button disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</button>
-                <span>Page {page} of {totalPages}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  Page 
+                  <select 
+                    value={page} 
+                    onChange={(e) => setPage(Number(e.target.value))}
+                    style={{ background: 'var(--bg-dark)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0.2rem 0.5rem', outline: 'none', cursor: 'pointer' }}
+                  >
+                    {[...Array(totalPages)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                  of {totalPages}
+                </span>
                 <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next</button>
               </div>
             )}
