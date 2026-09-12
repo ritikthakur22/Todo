@@ -27,7 +27,35 @@ export const useUpdateTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, data }) => updateTodo(id, data),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+        onMutate: async ({ id, data }) => {
+            await queryClient.cancelQueries({ queryKey: ["todos"] });
+            const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
+            
+            queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
+                if (!oldData || !oldData.pages) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map(page => ({
+                        ...page,
+                        data: page.data.map(todo => 
+                            todo._id === id ? { ...todo, ...data } : todo
+                        )
+                    }))
+                };
+            });
+            
+            return { previousTodos };
+        },
+        onError: (err, variables, context) => {
+            if (context?.previousTodos) {
+                context.previousTodos.forEach(([queryKey, data]) => {
+                    queryClient.setQueryData(queryKey, data);
+                });
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["todos"] });
+        },
     });
 };
 
