@@ -63,7 +63,33 @@ export const useDeleteTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteTodo,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+        onMutate: async (id) => {
+            await queryClient.cancelQueries({ queryKey: ["todos"] });
+            const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
+            
+            queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
+                if (!oldData || !oldData.pages) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map(page => ({
+                        ...page,
+                        data: page.data.filter(todo => todo._id !== id)
+                    }))
+                };
+            });
+            
+            return { previousTodos };
+        },
+        onError: (err, id, context) => {
+            if (context?.previousTodos) {
+                context.previousTodos.forEach(([queryKey, data]) => {
+                    queryClient.setQueryData(queryKey, data);
+                });
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["todos"] });
+        },
     });
 };
 

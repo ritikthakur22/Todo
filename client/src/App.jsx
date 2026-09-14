@@ -81,9 +81,11 @@ function App() {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteTodoReq(id);
-    } catch (err) { setMutationError(err.message); }
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      try {
+        await deleteTodoReq(id);
+      } catch (err) { setMutationError(err.message); }
+    }
   };
 
   const handleDragEnd = async (event) => {
