@@ -19,7 +19,8 @@
     "nepali-date-converter": "^3.4.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

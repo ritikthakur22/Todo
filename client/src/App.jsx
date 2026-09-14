@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Home, BarChart2, Moon, Sun, CheckSquare } from 'lucide-react';
 import { useTodos, useAddTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } from './hooks/todo.hook';
+import { useQueryClient } from '@tanstack/react-query';
 import TodoForm from './components/TodoForm';
 import ConfirmModal from './components/ConfirmModal';
 import TodoList from './components/TodoList';
@@ -9,7 +10,12 @@ import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import NepaliDate from 'nepali-date-converter';
+import { io } from 'socket.io-client';
 import './index.css';
+
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/todos';
+const socket = io(API_URL.replace('/api/todos', ''));
 
 function App() {
   const [mutationError, setMutationError] = useState(null);
@@ -18,6 +24,28 @@ function App() {
   const [currentTab, setCurrentTab] = useState('tasks');
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [deleteId, setDeleteId] = useState(null);
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleAdd = (todo) => {
+      // Small delay to ensure our own optimistic updates finish first
+      setTimeout(() => queryClient.invalidateQueries({ queryKey: ["todos"] }), 100);
+    };
+    
+    socket.on('todo_added', handleAdd);
+    socket.on('todo_updated', handleAdd);
+    socket.on('todo_deleted', handleAdd);
+    socket.on('todos_reordered', handleAdd);
+
+    return () => {
+      socket.off('todo_added', handleAdd);
+      socket.off('todo_updated', handleAdd);
+      socket.off('todo_deleted', handleAdd);
+      socket.off('todos_reordered', handleAdd);
+    };
+  }, [queryClient]);
+
 
   // ── Infinite Query ──────────────────────────────────────────
   const {

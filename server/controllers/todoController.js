@@ -65,6 +65,7 @@ export const createTodo = async (req, res) => {
     const newTodo = await Todo.create({ title, description, priority, dueDate, category, tags, attachmentUrl, createdBy, assignedTo, subtasks });
 
     // 201 = Created — something new was made
+    if (req.app.get('io')) req.app.get('io').emit('todo_added', newTodo);
     res.status(201).json(newTodo);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -108,6 +109,7 @@ export const updateTodo = async (req, res) => {
       return res.status(404).json({ message: 'Todo not found' });
     }
 
+    if (req.app.get('io')) req.app.get('io').emit('todo_updated', updatedTodo);
     res.status(200).json(updatedTodo);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -126,6 +128,7 @@ export const deleteTodo = async (req, res) => {
       return res.status(404).json({ message: 'Todo not found' });
     }
 
+    if (req.app.get('io')) req.app.get('io').emit('todo_deleted', id);
     res.status(200).json({ message: 'Todo deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -146,6 +149,7 @@ export const reorderTodos = async (req, res) => {
     }));
 
     await Todo.bulkWrite(bulkOps);
+    if (req.app.get('io')) req.app.get('io').emit('todos_reordered');
     res.status(200).json({ message: 'Reordered successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
