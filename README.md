@@ -5,11 +5,23 @@
 🚀 **Live Demo:** [https://todocrdy.vercel.app/](https://todocrdy.vercel.app/)
 
 
+
+## 🚀 Version 2.0 Mega Update Features
+- **Real-Time Collaboration**: Instant sync across all connected clients via `socket.io` WebSockets.
+- **Optimistic UI**: Instant perceived performance (zero-latency UI updates) powered by `@tanstack/react-query`.
+- **Drag & Drop Reordering**: Fluid sorting with `@dnd-kit/sortable`.
+- **Advanced Task Management**: Subtasks, Priority badges, Categories, Assignments, and Due Dates.
+- **Image Attachments**: Securely upload and host images using `Cloudinary` + `Multer`.
+- **Infinite Scrolling**: Auto-loads more tasks using the `IntersectionObserver` API as you scroll.
+- **Global Dashboard Statistics**: Live analytical breakdown (Total, Completed, Pending).
+- **Advanced Keyboard Navigation**: `Ctrl+Enter` shortcut, `Escape` to close, and an accessible Focus Trap inside modals.
+- **Nepali Date System**: Integrated `nepali-date-converter` for dual date display (BS).
+
 ## 🛠 What is Used
 - **Frontend**: React.js, Vite
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB (Atlas) & Mongoose
-- **Other Tools**: Postman, MongoDB Compass
+- **Other Tools**: Postman, MongoDB Compass, Cloudinary, Socket.io, React Query, Dnd-Kit
 
 ## 🤔 Why Used
 - **React.js**: For building a fast, interactive user interface using a component-based architecture.

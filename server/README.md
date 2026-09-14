@@ -53,8 +53,34 @@ This is the most important diagram in the entire project.
 16. User sees "Buy milk" appear in the list ✅
 ```
 
----
 
+## ⚡ Version 2.0 Backend Additions
+
+### 1. Real-Time WebSockets (Socket.io)
+We attached a `socket.io` server directly to our Express HTTP server to broadcast events.
+```js
+// server.js
+const io = new Server(server, { cors: { origin: "*" } });
+app.set('io', io);
+
+// controller.js
+req.app.get('io').emit('todo_added', newTodo);
+```
+
+### 2. File Uploads (Multer + Cloudinary)
+Instead of saving images to a local folder, we parse them in memory using `multer` and stream them securely to Cloudinary's CDN.
+```js
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+
+const upload = multer({ storage: multer.memoryStorage() });
+// Cloudinary handles the image hosting and returns a fast CDN URL.
+```
+
+### 3. Pagination & Aggregated Stats
+The `GET /api/todos` endpoint now uses `.limit()` and `.skip()` to handle thousands of tasks without crashing, while simultaneously returning accurate global statistics.
+
+---
 ## 🏛 MVC Explained
 
 MVC = **Model, View, Controller** — a way to organize backend code

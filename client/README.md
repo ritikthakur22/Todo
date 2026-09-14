@@ -95,6 +95,36 @@ Never mutate state directly. Always create new values:
 // Updating:   oldArray.map(item => item.id === id ? {...item, ...changes} : item)
 ```
 
+
+### 9. Optimistic UI (TanStack React Query)
+React Query completely replaces `useEffect` fetching and handles caching, background updates, and "Optimistic Updates".
+```js
+// Instantly update the UI BEFORE the backend confirms the save!
+onMutate: async (newTodo) => {
+  queryClient.setQueriesData(["todos"], (oldData) => {
+    // Inject fake 'temp' ID instantly
+    return [newTodo, ...oldData]; 
+  });
+}
+```
+
+### 10. WebSockets (Socket.io-client)
+Listens to live backend events without refreshing the page.
+```js
+import { io } from 'socket.io-client';
+const socket = io('http://localhost:5000');
+
+useEffect(() => {
+  socket.on('todo_added', () => queryClient.invalidateQueries(["todos"]));
+}, []);
+```
+
+### 11. Infinite Scrolling (IntersectionObserver)
+Detects when the user scrolls to the bottom of the page to fetch the next "page" of data automatically.
+
+### 12. Focus Traps (Accessibility UX)
+Locking the `Tab` key inside a modal so users can't accidentally navigate the background website while a confirmation popup is open.
+
 ---
 
 ## 📖 JavaScript Concepts Used
