@@ -5,7 +5,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { uploadImage } from '../api/todoapi';
 
-function TodoItem({ todo, onToggle, onDelete, onEdit }) {
+function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: todo._id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
@@ -125,7 +125,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
         <input type="checkbox" checked={todo.completed} onChange={() => onToggle(todo._id)} />
       </div>
       
-      <div className="task-content">
+      <div className="task-content" onClick={() => onClickTodo(todo)} style={{ cursor: "pointer", flex: 1 }}>
         <div className="task-title">{todo.title}</div>
         {todo.description && <div className="task-desc">{todo.description}</div>}
         {todo.attachmentUrl && (
@@ -133,7 +133,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }) {
             <img 
               src={todo.attachmentUrl} 
               alt="attachment" 
-              onClick={() => setIsZoomed(true)}
+              onClick={(e) => { e.stopPropagation(); setIsZoomed(true); }}
               style={{ maxWidth: '100px', borderRadius: '4px', border: '1px solid var(--border-color)', cursor: 'zoom-in' }} 
             />
           </div>

@@ -93,11 +93,11 @@ function TodoForm({ onAdd }) {
         <div className="form-options">
           <div className="option-group">
             <label><User size={14} /> Created By</label>
-            <input type="text" value={createdBy} onChange={e => setCreatedBy(e.target.value)} placeholder="e.g. Ritik" />
+            <input type="text" value={createdBy} onChange={e => setCreatedBy(e.target.value)} placeholder="e.g. Ritik" list="user-suggestions" />
           </div>
           <div className="option-group">
             <label><User size={14} /> Assign To</label>
-            <input type="text" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} placeholder="e.g. Rahul" />
+            <input type="text" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} placeholder="e.g. Rahul" list="user-suggestions" />
           </div>
           <div className="option-group">
             <label><Flag size={14} /> Priority</label>
@@ -115,6 +115,16 @@ function TodoForm({ onAdd }) {
           </div>
         </div>
       </form>
+
+      <datalist id="user-suggestions">
+        <option value="Aadaarsh" />
+        <option value="Amit" />
+        <option value="Ritik" />
+        <option value="Sujal" />
+        <option value="Sumit" />
+        <option value="Sushil" />
+      </datalist>
+
     </div>
   );
 }

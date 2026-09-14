@@ -2,7 +2,7 @@
 import TodoItem from './TodoItem';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-function TodoList({ todos, onToggle, onDelete, onEdit }) {
+function TodoList({ todos, onToggle, onDelete, onEdit, onClickTodo }) {
   if (todos.length === 0) {
     return (
       <div className="empty-state">
@@ -20,7 +20,7 @@ function TodoList({ todos, onToggle, onDelete, onEdit }) {
             todo={todo}
             onToggle={onToggle}
             onDelete={onDelete}
-            onEdit={onEdit}
+            onEdit={onEdit} onClickTodo={onClickTodo}
           />
         ))}
       </div>

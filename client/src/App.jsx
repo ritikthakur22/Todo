@@ -5,6 +5,7 @@ import { useTodos, useAddTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } f
 import { useQueryClient } from '@tanstack/react-query';
 import TodoForm from './components/TodoForm';
 import ConfirmModal from './components/ConfirmModal';
+import TaskDetailModal from './components/TaskDetailModal';
 import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -20,10 +21,12 @@ const socket = io(API_URL.replace('/api/todos', ''));
 function App() {
   const [mutationError, setMutationError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState('tasks');
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [deleteId, setDeleteId] = useState(null);
+  const [selectedTodo, setSelectedTodo] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -47,16 +50,13 @@ function App() {
   }, [queryClient]);
 
 
-  // ── Infinite Query ──────────────────────────────────────────
+  const [page, setPage] = useState(1);
   const {
     data,
     isLoading,
     isError,
     error: queryError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useTodos(10);
+  } = useTodos(page, 10);
   const { mutateAsync: addTodo } = useAddTodo();
   const { mutateAsync: updateTodoReq } = useUpdateTodo();
   const { mutateAsync: deleteTodoReq } = useDeleteTodo();
@@ -64,22 +64,15 @@ function App() {
 
   // Flatten all fetched pages into one array
 
-  const observer = useRef();
-  const lastTodoElementRef = useCallback(node => {
-    if (isLoading || isFetchingNextPage) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage]);
+
 
   const todos = useMemo(
-    () => (data?.pages ?? []).flatMap((page) => page.data),
+    () => data?.data ?? [],
     [data]
   );
+  
+  const totalPages = data?.pagination?.pages || 1;
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -144,14 +137,23 @@ function App() {
     }
   };
 
-  const filteredTodos = todos.filter((todo) => {
+  const priorityValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
+  
+  const filteredTodos = [...todos].filter((todo) => {
     const matchesFilter = filter === 'active' ? !todo.completed : filter === 'completed' ? todo.completed : true;
     const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = todo.title.toLowerCase().includes(searchLower) || (todo.description && todo.description.toLowerCase().includes(searchLower));
+    const matchesSearch = todo.title.toLowerCase().includes(searchLower) || (todo.description && todo.description.toLowerCase().includes(searchLower)) || (todo.createdBy && todo.createdBy.toLowerCase().includes(searchLower)) || (todo.assignedTo && todo.assignedTo.toLowerCase().includes(searchLower));
     return matchesFilter && matchesSearch;
+  }).sort((a, b) => {
+    if (sortBy === 'default') return 0;
+    const aMatch = a.priority?.toLowerCase() === sortBy;
+    const bMatch = b.priority?.toLowerCase() === sortBy;
+    if (aMatch && !bMatch) return -1;
+    if (bMatch && !aMatch) return 1;
+    return 0;
   });
 
-  const globalStats = data?.pages?.[0]?.stats || { total: 0, pending: 0, completed: 0 };
+  const globalStats = data?.stats || { total: 0, pending: 0, completed: 0 };
   const totalCount = globalStats.total;
   const pendingCount = globalStats.pending;
   const completedCount = globalStats.completed;
@@ -227,10 +229,21 @@ function App() {
 
             <div className="filters-row">
               <input type="text" className="search-bar" placeholder="Search tasks..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              <div className="filter-pills">
+              <div className="filter-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                 <button className={`pill ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All <span className="badge">{totalCount}</span></button>
                 <button className={`pill ${filter === 'active' ? 'active' : ''}`} onClick={() => setFilter('active')}>Active <span className="badge">{pendingCount}</span></button>
                 <button className={`pill ${filter === 'completed' ? 'active' : ''}`} onClick={() => setFilter('completed')}>Completed <span className="badge">{completedCount}</span></button>
+                
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  style={{ marginLeft: 'auto', padding: '0.4rem 0.8rem', borderRadius: '20px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                >
+                  <option value="default">Sort: Default</option>
+                  <option value="high">High Priority First</option>
+                  <option value="medium">Medium Priority First</option>
+                  <option value="low">Low Priority First</option>
+                </select>
               </div>
             </div>
 
@@ -238,19 +251,52 @@ function App() {
 
             {isLoading ? <div className="loading">Loading...</div> :
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <TodoList todos={filteredTodos} onToggle={handleToggle} onDelete={handleDelete} onEdit={handleEdit} />
+                <TodoList todos={filteredTodos} onToggle={handleToggle} onDelete={handleDelete} onEdit={handleEdit} onClickTodo={(todo) => setSelectedTodo(todo)} />
               </DndContext>
             }
 
-            {/* ── Auto Load More Trigger ───────────────────────────────── */}
-            <div ref={lastTodoElementRef} style={{ height: '20px', margin: '10px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-              {isFetchingNextPage && 'Loading more tasks...'}
-            </div>
+            {/* ── Pagination Controls ───────────────────────────────── */}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+                <button 
+                  disabled={page === 1} 
+                  onClick={() => setPage(p => p - 1)}
+                  style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: page === 1 ? 'not-allowed' : 'pointer' }}
+                >
+                  Previous
+                </button>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', fontWeight: 500 }}>
+                  Page 
+                  <select 
+                    value={page} 
+                    onChange={(e) => setPage(Number(e.target.value))}
+                    style={{ background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0.2rem 0.5rem' }}
+                  >
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                  of {totalPages}
+                </span>
+                <button 
+                  disabled={page === totalPages} 
+                  onClick={() => setPage(p => p + 1)}
+                  style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', cursor: page === totalPages ? 'not-allowed' : 'pointer' }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <StatsDashboard todos={todos} />
         )}
 
+            <TaskDetailModal 
+        isOpen={!!selectedTodo}
+        onClose={() => setSelectedTodo(null)}
+        todo={selectedTodo}
+      />
       <ConfirmModal 
         isOpen={!!deleteId} 
         onClose={() => setDeleteId(null)} 

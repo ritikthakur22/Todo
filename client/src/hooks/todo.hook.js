@@ -1,16 +1,10 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTodos, createTodo, updateTodo, deleteTodo, reorderTodos } from "../api/todoapi";
 
-export const useTodos = (limit = 10) => {
-    return useInfiniteQuery({
-        queryKey: ["todos", limit],
-        queryFn: ({ pageParam = 1 }) => getTodos(pageParam, limit),
-        getNextPageParam: (lastPage) => {
-            if (lastPage.pagination.page < lastPage.pagination.pages) {
-                return lastPage.pagination.page + 1;
-            }
-            return undefined;
-        },
+export const useTodos = (page = 1, limit = 10) => {
+    return useQuery({
+        queryKey: ["todos", page, limit],
+        queryFn: () => getTodos(page, limit),
         staleTime: 1000 * 60 * 5,
     });
 };
@@ -23,7 +17,6 @@ export const useAddTodo = () => {
             await queryClient.cancelQueries({ queryKey: ["todos"] });
             const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
             
-            // Create a fake ID for optimistic UI
             const optimisticTodo = { 
                 ...newTodoData, 
                 _id: 'temp-' + Date.now(),
@@ -32,13 +25,8 @@ export const useAddTodo = () => {
             };
 
             queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
-                if (!oldData || !oldData.pages) return oldData;
-                // Prepend the new task to the first page's data
-                const newPages = [...oldData.pages];
-                if (newPages.length > 0) {
-                    newPages[0] = { ...newPages[0], data: [optimisticTodo, ...newPages[0].data] };
-                }
-                return { ...oldData, pages: newPages };
+                if (!oldData || !oldData.data) return oldData;
+                return { ...oldData, data: [optimisticTodo, ...oldData.data] };
             });
             
             return { previousTodos };
@@ -65,15 +53,12 @@ export const useUpdateTodo = () => {
             const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
             
             queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
-                if (!oldData || !oldData.pages) return oldData;
+                if (!oldData || !oldData.data) return oldData;
                 return {
                     ...oldData,
-                    pages: oldData.pages.map(page => ({
-                        ...page,
-                        data: page.data.map(todo => 
-                            todo._id === id ? { ...todo, ...data } : todo
-                        )
-                    }))
+                    data: oldData.data.map(todo => 
+                        todo._id === id ? { ...todo, ...data } : todo
+                    )
                 };
             });
             
@@ -101,13 +86,10 @@ export const useDeleteTodo = () => {
             const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
             
             queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
-                if (!oldData || !oldData.pages) return oldData;
+                if (!oldData || !oldData.data) return oldData;
                 return {
                     ...oldData,
-                    pages: oldData.pages.map(page => ({
-                        ...page,
-                        data: page.data.filter(todo => todo._id !== id)
-                    }))
+                    data: oldData.data.filter(todo => todo._id !== id)
                 };
             });
             
@@ -129,6 +111,5 @@ export const useDeleteTodo = () => {
 export const useReorderTodos = () => {
     return useMutation({
         mutationFn: reorderTodos,
-        // Not invalidating immediately to allow smooth local state drag-and-drop
     });
 };

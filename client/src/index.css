@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+  color-scheme: dark;
   --bg-dark: #12141d;
   --bg-card: #1c1e29;
   --bg-card-hover: #232532;
@@ -16,6 +17,7 @@
 }
 
 body.light {
+  color-scheme: light;
   --bg-dark: #f3f4f6;
   --bg-card: #ffffff;
   --bg-card-hover: #f9fafb;
@@ -162,3 +164,4 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color
   outline: 2px solid white;
   outline-offset: 2px;
 }
+select option { background: var(--bg-card); color: var(--text-main); }
