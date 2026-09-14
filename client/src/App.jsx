@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Home, BarChart2, Moon, Sun, CheckSquare } from 'lucide-react';
 import { useTodos, useAddTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } from './hooks/todo.hook';
 import TodoForm from './components/TodoForm';
+import ConfirmModal from './components/ConfirmModal';
 import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -15,7 +16,8 @@ function App() {
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState('tasks');
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const [deleteId, setDeleteId] = useState(null);
 
   // ── Infinite Query ──────────────────────────────────────────
   const {
@@ -81,12 +83,16 @@ function App() {
     } catch (err) { setMutationError(err.message); }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      try {
-        await deleteTodoReq(id);
-      } catch (err) { setMutationError(err.message); }
-    }
+  const handleDelete = (id) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteTodoReq(deleteId);
+    } catch (err) { setMutationError(err.message); }
+    setDeleteId(null);
   };
 
   const handleDragEnd = async (event) => {
@@ -148,7 +154,7 @@ function App() {
               <div className="date-display" style={{ textAlign: 'right' }}>
                 <div>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</div>
                 <div style={{ fontSize: '0.85em', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  {new NepaliDate().format('dddd, MMMM D, YYYY')} (BS)
+                  {new NepaliDate().format('ddd, MMMM D, YYYY')} (BS)
                 </div>
               </div>
             </header>
@@ -211,6 +217,14 @@ function App() {
         ) : (
           <StatsDashboard todos={todos} />
         )}
+
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        onClose={() => setDeleteId(null)} 
+        onConfirm={confirmDelete}
+        title="Delete Task"
+        message="Are you sure you want to permanently delete this task? This action cannot be undone."
+      />
       </main>
     </div>
   );

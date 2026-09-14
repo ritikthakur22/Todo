@@ -52,7 +52,7 @@ function TodoForm({ onAdd }) {
       setIsUploading(false);
     }
 
-    onAdd({ title, description, priority, category, dueDate, createdBy, assignedTo, attachmentUrl, subtasks });
+    onAdd({ title, description, priority, category: 'Personal', dueDate, createdBy, assignedTo, attachmentUrl, subtasks });
     setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]);
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
