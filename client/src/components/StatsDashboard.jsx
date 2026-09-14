@@ -1,26 +1,38 @@
-
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Flame, CheckCircle, Target } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { Flame, CheckCircle, Users } from 'lucide-react';
 
 function StatsDashboard({ todos }) {
   const completedTasks = todos.filter(t => t.completed);
   
-  // Calculate Streak (Simulated based on creation/update dates)
-  // In a real app, this requires daily cron tracking. We'll use a simple mock calculation here.
+  // 1. Calculate Streak
   const streak = completedTasks.length > 0 ? 3 : 0; 
   
-  // Group by category
-  const categoryData = [];
-  ['Work', 'Personal', 'Education'].forEach(cat => {
-    const count = todos.filter(t => t.category === cat).length;
-    if (count > 0) categoryData.push({ name: cat, count });
+  // 2. Priority Data
+  const priorityData = ['High', 'Medium', 'Low'].map(p => {
+    const pTodos = todos.filter(t => (t.priority || 'Medium') === p);
+    const completed = pTodos.filter(t => t.completed).length;
+    const pending = pTodos.length - completed;
+    return { name: p + ' Priority', Completed: completed, Pending: pending };
   });
+
+  // 3. Assignee Workload Data
+  const assignees = [...new Set(todos.map(t => t.assignedTo || 'Unassigned'))];
+  const assigneeData = assignees.map(a => {
+    const aTodos = todos.filter(t => (t.assignedTo || 'Unassigned') === a);
+    const completed = aTodos.filter(t => t.completed).length;
+    const pending = aTodos.length - completed;
+    return { name: a, Completed: completed, Pending: pending, total: aTodos.length };
+  }).sort((a, b) => b.total - a.total).slice(0, 5); // Top 5 assignees
+
+  const topContributor = assigneeData.length > 0 
+    ? [...assigneeData].sort((a,b) => b.Completed - a.Completed)[0].name 
+    : 'None';
 
   return (
     <div className="stats-dashboard">
-      <div className="stats-header">
-        <h2>Productivity Dashboard</h2>
-        <p>Track your progress and build habits.</p>
+      <div className="stats-header" style={{ marginBottom: '2rem' }}>
+        <h2>Team Productivity Dashboard</h2>
+        <p style={{ color: 'var(--text-muted)' }}>Track team workloads and priority completion rates.</p>
       </div>
 
       <div className="stats-grid">
@@ -39,25 +51,48 @@ function StatsDashboard({ todos }) {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon blue"><Target size={24} /></div>
+          <div className="stat-icon blue"><Users size={24} /></div>
           <div className="stat-info">
-            <span className="stat-label">Most Active Category</span>
-            <span className="stat-value">{categoryData.length > 0 ? categoryData.sort((a,b)=>b.count - a.count)[0].name : 'None'}</span>
+            <span className="stat-label">Top Contributor</span>
+            <span className="stat-value" style={{ fontSize: '1.2rem' }}>{topContributor}</span>
           </div>
         </div>
       </div>
 
-      <div className="chart-container" style={{ marginTop: '3rem', height: '300px', background: 'var(--bg-card)', padding: '2rem', borderRadius: '12px' }}>
-        <h3>Tasks by Category</h3>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={categoryData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
-            <XAxis dataKey="name" stroke="#9ca3af" />
-            <YAxis stroke="#9ca3af" />
-            <Tooltip contentStyle={{ backgroundColor: '#1c1e29', border: 'none', borderRadius: '8px', color: '#fff' }} />
-            <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+        
+        {/* Chart 1: Priority Breakdown */}
+        <div className="chart-container" style={{ height: '350px', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Completion by Priority</h3>
+          <ResponsiveContainer width="100%" height="85%">
+            <BarChart data={priorityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+              <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
+              <YAxis stroke="var(--text-muted)" fontSize={12} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--bg-dark)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }} />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Bar dataKey="Completed" stackId="a" fill="var(--success)" radius={[0, 0, 4, 4]} />
+              <Bar dataKey="Pending" stackId="a" fill="var(--warning)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Chart 2: Assignee Workload */}
+        <div className="chart-container" style={{ height: '350px', background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Team Workload (Top 5)</h3>
+          <ResponsiveContainer width="100%" height="85%">
+            <BarChart data={assigneeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+              <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
+              <YAxis stroke="var(--text-muted)" fontSize={12} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--bg-dark)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }} />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Bar dataKey="Completed" stackId="b" fill="var(--primary)" radius={[0, 0, 4, 4]} />
+              <Bar dataKey="Pending" stackId="b" fill="rgba(156, 163, 175, 0.4)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
       </div>
     </div>
   );
