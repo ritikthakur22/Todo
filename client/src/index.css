@@ -3,12 +3,12 @@
 
 :root {
   color-scheme: dark;
-  --bg-dark: #12141d;
-  --bg-card: #1c1e29;
-  --bg-card-hover: #232532;
+  --bg-dark: #000000;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #141414;
   --text-main: #f3f4f6;
   --text-muted: #9ca3af;
-  --border-color: #2d3748;
+  --border-color: #333333;
   --primary: #3b82f6;
   --primary-hover: #2563eb;
   --danger: #ef4444;
@@ -25,6 +25,8 @@ body.light {
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
 }
+
+
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; transition: 0.2s; }
@@ -164,4 +166,5 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color
   outline: 2px solid white;
   outline-offset: 2px;
 }
+select option { background: var(--bg-card); color: var(--text-main); }
 select option { background: var(--bg-card); color: var(--text-main); }
