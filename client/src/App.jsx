@@ -112,6 +112,10 @@ function App() {
   };
 
   const handleDelete = (id) => {
+    if (id.toString().startsWith('temp-')) {
+      setMutationError("Wait a second! This task is still saving to the cloud.");
+      return;
+    }
     setDeleteId(id);
   };
 
