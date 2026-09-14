@@ -156,3 +156,9 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color
   .task-meta { flex-wrap: wrap; margin-right: 0; margin-bottom: 1rem; }
   .task-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 0.8rem; }
 }
+
+/* MODAL FOCUS STATE */
+.modal-content button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
