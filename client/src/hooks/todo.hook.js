@@ -19,7 +19,40 @@ export const useAddTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: createTodo,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+        onMutate: async (newTodoData) => {
+            await queryClient.cancelQueries({ queryKey: ["todos"] });
+            const previousTodos = queryClient.getQueriesData({ queryKey: ["todos"] });
+            
+            // Create a fake ID for optimistic UI
+            const optimisticTodo = { 
+                ...newTodoData, 
+                _id: 'temp-' + Date.now(),
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+
+            queryClient.setQueriesData({ queryKey: ["todos"] }, (oldData) => {
+                if (!oldData || !oldData.pages) return oldData;
+                // Prepend the new task to the first page's data
+                const newPages = [...oldData.pages];
+                if (newPages.length > 0) {
+                    newPages[0] = { ...newPages[0], data: [optimisticTodo, ...newPages[0].data] };
+                }
+                return { ...oldData, pages: newPages };
+            });
+            
+            return { previousTodos };
+        },
+        onError: (err, newTodo, context) => {
+            if (context?.previousTodos) {
+                context.previousTodos.forEach(([queryKey, data]) => {
+                    queryClient.setQueryData(queryKey, data);
+                });
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["todos"] });
+        },
     });
 };
 

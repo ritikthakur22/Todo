@@ -30,6 +30,12 @@ function TodoForm({ onAdd }) {
     setSubtasks(subtasks.filter((_, i) => i !== index));
   };
 
+    const handleKeyDown = (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      handleSubmit(e);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -56,12 +62,12 @@ function TodoForm({ onAdd }) {
       <h3>Add New Task</h3>
       <form onSubmit={handleSubmit} className="add-task-form">
         <div className="form-top">
-          <input type="text" placeholder="Task title (e.g. Study React)" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <button type="submit" className="btn-add" disabled={isUploading}>
+          <input type="text" placeholder="Task title (e.g. Study React)" value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={handleKeyDown} required />
+          <button type="submit" className="btn-add" disabled={isUploading} title="Shortcut: Ctrl+Enter">
             {isUploading ? 'Uploading...' : <><Plus size={16} /> Add Task</>}
           </button>
         </div>
-        <textarea placeholder="Add a description (optional)..." value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+        <textarea placeholder="Add a description (optional)..." value={description} onChange={(e) => setDescription(e.target.value)} onKeyDown={handleKeyDown}></textarea>
         <div className="subtasks-section" style={{ marginTop: '1rem', background: 'var(--bg-dark)', border: '1px solid var(--border-color)' }}>
           <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Subtasks</h4>
           {subtasks.map((st, i) => (

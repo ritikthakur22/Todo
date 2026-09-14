@@ -7,6 +7,7 @@ import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import NepaliDate from 'nepali-date-converter';
 import './index.css';
 
 function App() {
@@ -144,8 +145,11 @@ function App() {
                 <h1>My Tasks</h1>
                 <p>Stay organized and get things done. 💪</p>
               </div>
-              <div className="date-display">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+              <div className="date-display" style={{ textAlign: 'right' }}>
+                <div>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                <div style={{ fontSize: '0.85em', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  {new NepaliDate().format('dddd, MMMM D, YYYY')} (BS)
+                </div>
               </div>
             </header>
 
