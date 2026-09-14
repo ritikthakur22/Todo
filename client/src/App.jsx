@@ -117,10 +117,11 @@ function App() {
 
   const confirmDelete = async () => {
     if (!deleteId) return;
+    const idToDelete = deleteId;
+    setDeleteId(null); // Close modal instantly
     try {
-      await deleteTodoReq(deleteId);
+      await deleteTodoReq(idToDelete); // Delete in background
     } catch (err) { setMutationError(err.message); }
-    setDeleteId(null);
   };
 
   const handleDragEnd = async (event) => {
