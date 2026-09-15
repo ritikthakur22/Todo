@@ -61,21 +61,7 @@ function TaskDetailModal({ isOpen, onClose, todo }) {
           </div>
         </div>
 
-        {todo.subtasks && todo.subtasks.length > 0 && (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h4 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Subtasks</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {todo.subtasks.map((st, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-main)' }}>
-                  <div style={{ width: '16px', height: '16px', borderRadius: '4px', border: '1px solid var(--primary)', background: st.completed ? 'var(--primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {st.completed && <X size={12} color="white" style={{ transform: 'rotate(45deg)' }} />}
-                  </div>
-                  <span style={{ textDecoration: st.completed ? 'line-through' : 'none', opacity: st.completed ? 0.5 : 1 }}>{st.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        
 
         {todo.attachmentUrl && (
           <div>

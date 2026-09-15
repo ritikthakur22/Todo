@@ -93,19 +93,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
             </div>
           </div>
           
-          <div className="subtasks-section">
-            <h4>Subtasks</h4>
-            {editData.subtasks.map((st, i) => (
-              <div key={i} className="subtask-row">
-                <input type="checkbox" checked={st.completed} onChange={() => toggleSubtask(i)} />
-                <span className={st.completed ? 'completed' : ''}>{st.title}</span>
-              </div>
-            ))}
-            <div className="add-subtask-row">
-              <input value={newSubtask} onChange={e => setNewSubtask(e.target.value)} placeholder="New subtask..." onKeyDown={e => e.key === 'Enter' && addSubtask()}/>
-              <button onClick={addSubtask}><Plus size={14}/></button>
-            </div>
-          </div>
+          
 
           <div className="edit-actions-row">
             <button className="btn-add" onClick={handleSave} disabled={isUploading}>{isUploading ? 'Saving...' : <><Save size={16} /> Save Changes</>}</button>
@@ -155,11 +143,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
             </a>
           </div>
         )}
-        {todo.subtasks && todo.subtasks.length > 0 && (
-          <div className="task-subtasks-preview">
-            {todo.subtasks.filter(st => st.completed).length} / {todo.subtasks.length} Subtasks
-          </div>
-        )}
+        
       </div>
 
       <div className="task-meta">

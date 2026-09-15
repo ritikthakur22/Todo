@@ -68,26 +68,7 @@ function TodoForm({ onAdd }) {
           </button>
         </div>
         <textarea placeholder="Add a description (optional)..." value={description} onChange={(e) => setDescription(e.target.value)} onKeyDown={handleKeyDown}></textarea>
-        <div className="subtasks-section" style={{ marginTop: '1rem', background: 'var(--bg-dark)', border: '1px solid var(--border-color)' }}>
-          <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Subtasks</h4>
-          {subtasks.map((st, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
-              <span>• {st.title}</span>
-              <button type="button" onClick={() => removeSubtask(i)} style={{ background: 'transparent', color: 'var(--danger)', border: 'none', cursor: 'pointer' }}><X size={14}/></button>
-            </div>
-          ))}
-          <div className="add-subtask-row" style={{ display: 'flex', gap: '0.5rem' }}>
-            <input 
-              type="text" 
-              value={newSubtask} 
-              onChange={e => setNewSubtask(e.target.value)} 
-              placeholder="Add a subtask..." 
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSubtask(); } }}
-              style={{ flex: 1, padding: '0.4rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'transparent', color: 'white' }}
-            />
-            <button type="button" onClick={addSubtask} style={{ padding: '0 0.8rem', borderRadius: '4px', background: 'var(--border-color)', color: 'white', border: 'none', cursor: 'pointer' }}>Add</button>
-          </div>
-        </div>
+        
 
         
         <div className="form-options">
