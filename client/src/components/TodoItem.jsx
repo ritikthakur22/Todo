@@ -33,6 +33,12 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
     return <ArrowDown size={12} color="#10b981" />;
   };
 
+  
+  const handleEditAssignChange = (e) => {
+    const options = Array.from(e.target.selectedOptions, option => option.value);
+    setEditData({...editData, assignedTo: options.join(', ')});
+  };
+
   const handleSave = async () => {
     if (!editData.title.trim()) return;
     setIsUploading(true);
@@ -84,8 +90,8 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
             </div>
             <div className="option-group">
               <label>Assign To</label>
-              <select value={editData.assignedTo} onChange={e => setEditData({...editData, assignedTo: e.target.value})}>
-                <option value="" disabled>Select user...</option>
+              <select multiple value={editData.assignedTo.split(', ')} onChange={handleEditAssignChange} style={{ height: '80px' }}>
+                <option value="" disabled>Select user(s)...</option>
                 <option value="Aadaarsh">Aadaarsh</option>
                 <option value="Amit">Amit</option>
                 <option value="Ritik">Ritik</option>
