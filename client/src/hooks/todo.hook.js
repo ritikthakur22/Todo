@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTodos, createTodo, updateTodo, deleteTodo, reorderTodos } from "../api/todoapi";
+import { getTodos, createTodo, updateTodo, deleteTodo, reorderTodos, restoreTodo, hardDeleteTodo } from "../api/todoapi";
 
-export const useTodos = (page = 1, limit = 10) => {
+export const useTodos = (page = 1, limit = 10, trash = false) => {
     return useQuery({
-        queryKey: ["todos", page, limit],
-        queryFn: () => getTodos(page, limit),
+        queryKey: ["todos", page, limit, trash],
+        queryFn: () => getTodos(page, limit, trash),
         staleTime: 1000 * 60 * 5,
     });
 };
@@ -111,5 +111,25 @@ export const useDeleteTodo = () => {
 export const useReorderTodos = () => {
     return useMutation({
         mutationFn: reorderTodos,
+    });
+};
+
+export const useRestoreTodo = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: restoreTodo,
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["todos"] });
+        },
+    });
+};
+
+export const useHardDeleteTodo = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: hardDeleteTodo,
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["todos"] });
+        },
     });
 };

@@ -25,10 +25,13 @@ export const getTodos = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const total = await Todo.countDocuments();
-    const completedCount = await Todo.countDocuments({ completed: true });
+    const isTrash = req.query.trash === 'true';
+    const query = isTrash ? { isDeleted: true } : { isDeleted: { $ne: true } };
+    
+    const total = await Todo.countDocuments(query);
+    const completedCount = await Todo.countDocuments({ ...query, completed: true });
     const pendingCount = total - completedCount;
-    const todos = await Todo.find({})
+    const todos = await Todo.find(query)
       .sort({ order: 1, createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -121,15 +124,34 @@ export const updateTodo = async (req, res) => {
 export const deleteTodo = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const deletedTodo = await Todo.findByIdAndDelete(id);
-
-    if (!deletedTodo) {
-      return res.status(404).json({ message: 'Todo not found' });
-    }
-
+    const deletedTodo = await Todo.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+    if (!deletedTodo) return res.status(404).json({ message: 'Todo not found' });
     if (req.app.get('io')) req.app.get('io').emit('todo_deleted', id);
-    res.status(200).json({ message: 'Todo deleted successfully' });
+    res.status(200).json({ message: 'Todo soft-deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const restoreTodo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const restoredTodo = await Todo.findByIdAndUpdate(id, { isDeleted: false }, { new: true });
+    if (!restoredTodo) return res.status(404).json({ message: 'Todo not found' });
+    if (req.app.get('io')) req.app.get('io').emit('todo_restored', id);
+    res.status(200).json({ message: 'Todo restored successfully', data: restoredTodo });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const hardDeleteTodo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedTodo = await Todo.findByIdAndDelete(id);
+    if (!deletedTodo) return res.status(404).json({ message: 'Todo not found' });
+    if (req.app.get('io')) req.app.get('io').emit('todo_hard_deleted', id);
+    res.status(200).json({ message: 'Todo permanently deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

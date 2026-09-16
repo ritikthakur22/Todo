@@ -25,6 +25,7 @@ const todoSchema = new mongoose.Schema(
     tags: { type: [String], default: [] },
     
     completed: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
     subtasks: [
       {
         title: { type: String, required: true },

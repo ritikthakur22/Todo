@@ -7,7 +7,7 @@ function TodoForm({ onAdd }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Medium');
-  const [createdBy, setCreatedBy] = useState('');
+  const [createdBy, setCreatedBy] = useState('Amit');
   const [assignedTo, setAssignedTo] = useState([]);
   const [dueDate, setDueDate] = useState(() => {
     const d = new Date();
@@ -39,9 +39,12 @@ function TodoForm({ onAdd }) {
     setSubtasks(subtasks.filter((_, i) => i !== index));
   };
 
-    const handleKeyDown = (e) => {
+  const handleKeyDown = (e) => {
     if (e.ctrlKey && e.key === 'Enter') {
-      handleSubmit(e);
+      e.preventDefault();
+      if (e.currentTarget.form) {
+        e.currentTarget.form.requestSubmit();
+      }
     }
   };
 
@@ -62,7 +65,7 @@ function TodoForm({ onAdd }) {
     }
 
     onAdd({ title, description, priority, category: 'Personal', dueDate, createdBy, assignedTo: assignedTo.join(', '), attachmentUrl, subtasks });
-    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]); setCreatedBy(''); setAssignedTo([]);
+    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]); setCreatedBy('Amit'); setAssignedTo([]);
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
 

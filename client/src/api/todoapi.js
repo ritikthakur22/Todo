@@ -1,7 +1,7 @@
 import { apiClient } from "./axios";
 
-export const getTodos = async(page, limit)=>{
-    const response = await apiClient.get(`?page=${page}&limit=${limit}`);
+export const getTodos = async(page, limit, trash = false)=>{
+    const response = await apiClient.get(`?page=${page}&limit=${limit}${trash ? '&trash=true' : ''}`);
     return response.data;
 }
 
@@ -31,5 +31,15 @@ export const uploadImage = async (file) => {
     const response = await apiClient.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
+    return response.data;
+};
+
+export const restoreTodo = async (id) => {
+    const response = await apiClient.patch(`/${id}/restore`);
+    return response.data;
+};
+
+export const hardDeleteTodo = async (id) => {
+    const response = await apiClient.delete(`/${id}/hard`);
     return response.data;
 };
