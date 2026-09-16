@@ -8,7 +8,7 @@ function TodoForm({ onAdd }) {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [createdBy, setCreatedBy] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+  const [assignedTo, setAssignedTo] = useState([]);
   const [dueDate, setDueDate] = useState(() => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -20,7 +20,13 @@ function TodoForm({ onAdd }) {
   const [newSubtask, setNewSubtask] = useState('');
   const fileInputRef = useRef(null);
 
-    const addSubtask = () => {
+    
+  const handleAssignChange = (e) => {
+    const options = Array.from(e.target.selectedOptions, option => option.value);
+    setAssignedTo(options);
+  };
+
+  const addSubtask = () => {
     if (!newSubtask.trim()) return;
     setSubtasks([...subtasks, { title: newSubtask, completed: false }]);
     setNewSubtask('');
@@ -52,8 +58,8 @@ function TodoForm({ onAdd }) {
       setIsUploading(false);
     }
 
-    onAdd({ title, description, priority, category: 'Personal', dueDate, createdBy, assignedTo, attachmentUrl, subtasks });
-    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]); setCreatedBy(''); setAssignedTo('');
+    onAdd({ title, description, priority, category: 'Personal', dueDate, createdBy, assignedTo: assignedTo.join(', '), attachmentUrl, subtasks });
+    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]); setCreatedBy(''); setAssignedTo([]);
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -86,8 +92,8 @@ function TodoForm({ onAdd }) {
           </div>
           <div className="option-group">
             <label><User size={14} /> Assign To</label>
-            <select value={assignedTo} onChange={e => setAssignedTo(e.target.value)} required>
-              <option value="" disabled>Select user...</option>
+            <select multiple value={assignedTo} onChange={handleAssignChange} required style={{ height: '80px' }}>
+              <option value="" disabled>Select user(s)...</option>
               <option value="Aadaarsh">Aadaarsh</option>
               <option value="Amit">Amit</option>
               <option value="Ritik">Ritik</option>
