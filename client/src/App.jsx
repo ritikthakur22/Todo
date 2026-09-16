@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import TodoForm from './components/TodoForm';
 import ConfirmModal from './components/ConfirmModal';
 import TaskDetailModal from './components/TaskDetailModal';
+import TrashModal from './components/TrashModal';
 import TodoList from './components/TodoList';
 import StatsDashboard from './components/StatsDashboard';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -27,6 +28,29 @@ function App() {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [deleteId, setDeleteId] = useState(null);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [showTrash, setShowTrash] = useState(false);
+
+  // Keyboard shortcut listener: Alt + R + T to toggle Trash
+  useEffect(() => {
+    let keyBuffer = [];
+    const handleKeyDown = (e) => {
+      if (!e.altKey) {
+        keyBuffer = [];
+        return;
+      }
+      
+      keyBuffer.push(e.key.toLowerCase());
+      if (keyBuffer.length > 2) keyBuffer.shift();
+      
+      if (keyBuffer.join('') === 'rt') {
+        setShowTrash(prev => !prev);
+        keyBuffer = []; // reset after trigger
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const queryClient = useQueryClient();
 
@@ -302,9 +326,9 @@ function App() {
         onClose={() => setDeleteId(null)} 
         onConfirm={confirmDelete}
         title="Delete Task"
-        message="Are you sure you want to permanently delete this task? This action cannot be undone."
+        message="Are you sure you want to delete this task? It will be moved to the Trash."
       />
-      </main>
+      <TrashModal isOpen={showTrash} onClose={() => setShowTrash(false)} /></main>
     </div>
   );
 }

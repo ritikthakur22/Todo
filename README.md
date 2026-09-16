@@ -39,6 +39,7 @@
 - **Separation of Concerns**: The frontend and backend are completely decoupled.
 - **Scalability**: Can easily swap the frontend or backend without affecting the other.
 - **Modern Workflow**: Uses modern tools like Vite and ES Modules.
+- **Trash feature**: instead of deleting the todos permanently, it moves them to the trash and can be restored. Trash ui is hidden and can be opened with `alt + r + t` shortcut.
 
 ## 🚀 Guide for Demo Running (Commands to Start)
 

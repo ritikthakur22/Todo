@@ -8,7 +8,7 @@
 //   "GET /api/todos?      → I'll send you to getTodos"
 //   "POST /api/todos?     → I'll send you to createTodo"
 //   "PUT /api/todos/:id?  → I'll send you to updateTodo"
-//   "DELETE /api/todos/:id? → I'll send you to deleteTodo"
+//   "DELETE /api/todos/:id? → I'll send you to deleteTodo, restoreTodo, hardDeleteTodo"
 
 import express from 'express';
 import multer from 'multer';
@@ -28,7 +28,7 @@ import {
   getTodos,
   createTodo,
   updateTodo,
-  deleteTodo,
+  deleteTodo, restoreTodo, hardDeleteTodo,
 } from '../controllers/todoController.js';
 
 // express.Router() creates a mini Express app just for these routes.
@@ -62,6 +62,9 @@ router.put('/reorder', reorderTodos);
 router.put('/:id', updateTodo);
 
 // DELETE /api/todos/:id   → delete a specific todo
-router.delete('/:id', deleteTodo);
+router.delete('/:id', deleteTodo, restoreTodo, hardDeleteTodo);
 
 export default router;
+
+router.patch('/:id/restore', restoreTodo);
+router.delete('/:id/hard', hardDeleteTodo);
