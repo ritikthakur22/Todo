@@ -34,9 +34,13 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
   };
 
   
-  const handleEditAssignChange = (e) => {
-    const options = Array.from(e.target.selectedOptions, option => option.value);
-    setEditData({...editData, assignedTo: options.join(', ')});
+  const toggleEditAssignee = (name) => {
+    const current = editData.assignedTo ? editData.assignedTo.split(', ').filter(Boolean) : [];
+    if (current.includes(name)) {
+      setEditData({...editData, assignedTo: current.filter(n => n !== name).join(', ')});
+    } else {
+      setEditData({...editData, assignedTo: [...current, name].join(', ')});
+    }
   };
 
   const handleSave = async () => {
@@ -90,15 +94,25 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
             </div>
             <div className="option-group">
               <label>Assign To</label>
-              <select multiple value={editData.assignedTo.split(', ')} onChange={handleEditAssignChange} style={{ height: '80px' }}>
-                <option value="" disabled>Select user(s)...</option>
-                <option value="Aadaarsh">Aadaarsh</option>
-                <option value="Amit">Amit</option>
-                <option value="Ritik">Ritik</option>
-                <option value="Sujal">Sujal</option>
-                <option value="Sumit">Sumit</option>
-                <option value="Sushil">Sushil</option>
-              </select>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                {['Aadaarsh', 'Amit', 'Ritik', 'Sujal', 'Sumit', 'Sushil'].map(name => {
+                  const isAssigned = (editData.assignedTo ? editData.assignedTo.split(', ') : []).includes(name);
+                  return (
+                    <span 
+                      key={name}
+                      onClick={() => toggleEditAssignee(name)}
+                      style={{ 
+                        padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', cursor: 'pointer',
+                        background: isAssigned ? 'var(--primary)' : 'transparent',
+                        border: '1px solid ' + (isAssigned ? 'var(--primary)' : 'var(--border-color)'),
+                        color: isAssigned ? 'white' : 'var(--text-main)'
+                      }}
+                    >
+                      {name}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
             <div className="option-group">
               <label>Priority</label>

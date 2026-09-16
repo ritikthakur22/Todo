@@ -21,9 +21,12 @@ function TodoForm({ onAdd }) {
   const fileInputRef = useRef(null);
 
     
-  const handleAssignChange = (e) => {
-    const options = Array.from(e.target.selectedOptions, option => option.value);
-    setAssignedTo(options);
+  const toggleAssignee = (name) => {
+    if (assignedTo.includes(name)) {
+      setAssignedTo(assignedTo.filter(n => n !== name));
+    } else {
+      setAssignedTo([...assignedTo, name]);
+    }
   };
 
   const addSubtask = () => {
@@ -92,15 +95,22 @@ function TodoForm({ onAdd }) {
           </div>
           <div className="option-group">
             <label><User size={14} /> Assign To</label>
-            <select multiple value={assignedTo} onChange={handleAssignChange} required style={{ height: '80px' }}>
-              <option value="" disabled>Select user(s)...</option>
-              <option value="Aadaarsh">Aadaarsh</option>
-              <option value="Amit">Amit</option>
-              <option value="Ritik">Ritik</option>
-              <option value="Sujal">Sujal</option>
-              <option value="Sumit">Sumit</option>
-              <option value="Sushil">Sushil</option>
-            </select>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', maxWidth: '200px' }}>
+              {['Aadaarsh', 'Amit', 'Ritik', 'Sujal', 'Sumit', 'Sushil'].map(name => (
+                <span 
+                  key={name}
+                  onClick={() => toggleAssignee(name)}
+                  style={{ 
+                    padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', cursor: 'pointer',
+                    background: assignedTo.includes(name) ? 'var(--primary)' : 'transparent',
+                    border: '1px solid ' + (assignedTo.includes(name) ? 'var(--primary)' : 'var(--border-color)'),
+                    color: assignedTo.includes(name) ? 'white' : 'var(--text-main)'
+                  }}
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
           </div>
           <div className="option-group">
             <label><Flag size={14} /> Priority</label>
