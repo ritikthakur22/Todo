@@ -1,5 +1,6 @@
 
-import { useState} from 'react';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Edit2, Trash2, Calendar,ArrowUp, ArrowRight, ArrowDown, Save, X, GripVertical, Plus, User, Image as ImageIcon} from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -15,8 +16,8 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
     description: todo.description || '',
     priority: todo.priority || 'Medium',
     category: todo.category || 'Personal',
-    createdBy: todo.createdBy || 'Ritik',
-    assignedTo: todo.assignedTo || 'Myself',
+    createdBy: todo.createdBy || '',
+    assignedTo: todo.assignedTo || '',
     dueDate: todo.dueDate ? todo.dueDate.split('T')[0] : '',
     subtasks: todo.subtasks || [],
     attachmentUrl: todo.attachmentUrl || ''
@@ -71,11 +72,27 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
           <div className="edit-options-row">
             <div className="option-group">
               <label>Created By</label>
-              <input type="text" value={editData.createdBy} onChange={e => setEditData({...editData, createdBy: e.target.value})} />
+              <select value={editData.createdBy} onChange={e => setEditData({...editData, createdBy: e.target.value})}>
+                <option value="" disabled>Select user...</option>
+                <option value="Aadaarsh">Aadaarsh</option>
+                <option value="Amit">Amit</option>
+                <option value="Ritik">Ritik</option>
+                <option value="Sujal">Sujal</option>
+                <option value="Sumit">Sumit</option>
+                <option value="Sushil">Sushil</option>
+              </select>
             </div>
             <div className="option-group">
               <label>Assign To</label>
-              <input type="text" value={editData.assignedTo} onChange={e => setEditData({...editData, assignedTo: e.target.value})} />
+              <select value={editData.assignedTo} onChange={e => setEditData({...editData, assignedTo: e.target.value})}>
+                <option value="" disabled>Select user...</option>
+                <option value="Aadaarsh">Aadaarsh</option>
+                <option value="Amit">Amit</option>
+                <option value="Ritik">Ritik</option>
+                <option value="Sujal">Sujal</option>
+                <option value="Sumit">Sumit</option>
+                <option value="Sushil">Sushil</option>
+              </select>
             </div>
             <div className="option-group">
               <label>Priority</label>
@@ -127,21 +144,26 @@ function TodoItem({ todo, onToggle, onDelete, onEdit, onClickTodo }) {
           </div>
         )}
         
-        {isZoomed && (
+        {isZoomed && createPortal(
           <div 
-            onClick={() => setIsZoomed(false)}
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
           >
-            <img src={todo.attachmentUrl} style={{ maxWidth: '90%', maxHeight: '80%', borderRadius: '8px', cursor: 'zoom-out' }} />
+            <img 
+              src={todo.attachmentUrl} 
+              style={{ maxWidth: '90%', maxHeight: '80%', borderRadius: '8px', cursor: 'zoom-out', opacity: 1 }} 
+              onClick={(e) => e.stopPropagation()}
+            />
             <a 
               href={todo.attachmentUrl.replace('/upload/', '/upload/fl_attachment/')} 
               download 
               onClick={(e) => e.stopPropagation()}
-              style={{ marginTop: '1rem', background: 'var(--primary)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', textDecoration: 'none' }}
+              style={{ marginTop: '1rem', background: 'var(--primary)', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' }}
             >
               Download Image
             </a>
-          </div>
+          </div>,
+          document.body
         )}
         
       </div>

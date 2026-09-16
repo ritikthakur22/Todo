@@ -7,8 +7,8 @@ function TodoForm({ onAdd }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Medium');
-  const [createdBy, setCreatedBy] = useState('Ritik');
-  const [assignedTo, setAssignedTo] = useState('Myself');
+  const [createdBy, setCreatedBy] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
   const [dueDate, setDueDate] = useState(() => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -53,7 +53,7 @@ function TodoForm({ onAdd }) {
     }
 
     onAdd({ title, description, priority, category: 'Personal', dueDate, createdBy, assignedTo, attachmentUrl, subtasks });
-    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]);
+    setTitle(''); setDescription(''); setAttachment(null); setSubtasks([]); setCreatedBy(''); setAssignedTo('');
     if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -74,11 +74,27 @@ function TodoForm({ onAdd }) {
         <div className="form-options">
           <div className="option-group">
             <label><User size={14} /> Created By</label>
-            <input type="text" value={createdBy} onChange={e => setCreatedBy(e.target.value)} placeholder="e.g. Ritik" list="user-suggestions" />
+            <select value={createdBy} onChange={e => setCreatedBy(e.target.value)} required>
+              <option value="" disabled>Select user...</option>
+              <option value="Aadaarsh">Aadaarsh</option>
+              <option value="Amit">Amit</option>
+              <option value="Ritik">Ritik</option>
+              <option value="Sujal">Sujal</option>
+              <option value="Sumit">Sumit</option>
+              <option value="Sushil">Sushil</option>
+            </select>
           </div>
           <div className="option-group">
             <label><User size={14} /> Assign To</label>
-            <input type="text" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} placeholder="e.g. Rahul" list="user-suggestions" />
+            <select value={assignedTo} onChange={e => setAssignedTo(e.target.value)} required>
+              <option value="" disabled>Select user...</option>
+              <option value="Aadaarsh">Aadaarsh</option>
+              <option value="Amit">Amit</option>
+              <option value="Ritik">Ritik</option>
+              <option value="Sujal">Sujal</option>
+              <option value="Sumit">Sumit</option>
+              <option value="Sushil">Sushil</option>
+            </select>
           </div>
           <div className="option-group">
             <label><Flag size={14} /> Priority</label>
@@ -97,14 +113,7 @@ function TodoForm({ onAdd }) {
         </div>
       </form>
 
-      <datalist id="user-suggestions">
-        <option value="Aadaarsh" />
-        <option value="Amit" />
-        <option value="Ritik" />
-        <option value="Sujal" />
-        <option value="Sumit" />
-        <option value="Sushil" />
-      </datalist>
+      
 
     </div>
   );

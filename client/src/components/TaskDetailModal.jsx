@@ -1,6 +1,9 @@
 import { X, Calendar, User, ArrowUp, ArrowRight, ArrowDown } from 'lucide-react';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 function TaskDetailModal({ isOpen, onClose, todo }) {
+  const [isZoomed, setIsZoomed] = useState(false);
   if (!isOpen || !todo) return null;
 
   const getPriorityColor = (p) => {
@@ -66,8 +69,35 @@ function TaskDetailModal({ isOpen, onClose, todo }) {
         {todo.attachmentUrl && (
           <div>
             <h4 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Attachment</h4>
-            <img src={todo.attachmentUrl} alt="Attachment" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
+            <img 
+              src={todo.attachmentUrl} 
+              alt="Attachment" 
+              onClick={(e) => { e.stopPropagation(); setIsZoomed(true); }}
+              style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-color)', cursor: 'zoom-in' }} 
+            />
           </div>
+        )}
+
+        {isZoomed && createPortal(
+          <div 
+            onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 99999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <img 
+              src={todo.attachmentUrl} 
+              style={{ maxWidth: '90%', maxHeight: '80%', borderRadius: '8px', cursor: 'zoom-out', opacity: 1 }} 
+              onClick={(e) => e.stopPropagation()}
+            />
+            <a 
+              href={todo.attachmentUrl.replace('/upload/', '/upload/fl_attachment/')} 
+              download 
+              onClick={(e) => e.stopPropagation()}
+              style={{ marginTop: '1rem', background: 'var(--primary)', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' }}
+            >
+              Download Image
+            </a>
+          </div>,
+          document.body
         )}
       </div>
     </div>
