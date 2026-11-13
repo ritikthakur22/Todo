@@ -1,8 +1,26 @@
-# Todo App - Full Stack Project
+# 📝 Todo App - Full-Stack Real-Time Workspace
+
+<div align="center">
+  <p><strong>A full-stack task management and real-time collaboration application powered by React, Vite, Express, Socket.io, and MongoDB Atlas.</strong></p>
+
+  <p>
+    <a href="https://todocrdy.vercel.app/"><img src="https://img.shields.io/badge/Vercel-Live_Demo-success?style=flat-square&logo=vercel" alt="Live Demo" /></a>
+    <img src="https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react&logoColor=white" alt="React 19" />
+    <img src="https://img.shields.io/badge/Vite-8-purple?style=flat-square&logo=vite&logoColor=white" alt="Vite" />
+    <img src="https://img.shields.io/badge/Node.js-20-green?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" />
+    <img src="https://img.shields.io/badge/Express-4-black?style=flat-square&logo=express&logoColor=white" alt="Express" />
+    <img src="https://img.shields.io/badge/MongoDB-Atlas-green?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB Atlas" />
+    <img src="https://img.shields.io/badge/Socket.io-4-black?style=flat-square&logo=socket.io&logoColor=white" alt="Socket.io" />
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT" /></a>
+    <a href="https://www.ritikthakur.com.np"><img src="https://img.shields.io/badge/Author-Ritik%20Thakur-blue?style=flat-square" alt="Author: Ritik Thakur" /></a>
+  </p>
+</div>
+
+---
 
 ![Dashboard Screenshot](./assets/screenshot.png)
 
-🚀 **Live Demo:** [https://todocrdy.vercel.app/](https://todocrdy.vercel.app/)
+🌐 **Live Application:** [https://todocrdy.vercel.app/](https://todocrdy.vercel.app/)
 
 
 
@@ -57,9 +75,6 @@ Open a terminal and run:
 cd server
 npm install
 npm run dev
-
-cd ~/extra/intern/task1/todo-app/server
- npm run dev
 ```
 The server will run on http://localhost:5000.
 
@@ -69,9 +84,6 @@ Open a second terminal and run:
 cd client
 npm install
 npm run dev
-
-cd ~/extra/intern/task1/todo-app/client
- npm run dev
 ```
 The frontend will run on http://localhost:5173.
 
@@ -101,3 +113,11 @@ The React/Vite client is hosted on [Vercel](https://vercel.com) for global CDN e
 For more detailed information, please check out:
 - [Frontend Guide](./client/README.md)
 - [Backend Guide](./server/README.md)
+
+---
+
+## 📄 License & Attribution
+
+This project is open-source and licensed under the [MIT License](LICENSE).
+
+Developed by [Ritik Thakur](https://www.ritikthakur.com.np).
